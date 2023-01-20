@@ -40,7 +40,7 @@ const NavBar = () => {
     }
   },[sessionData])
   return (
-    <nav className="fixed top-0 z-50 flex h-14 w-full items-center justify-end space-x-2 bg-level1 px-4 shadow-sm ">
+    <nav className=" top-0 z-50 flex h-14 w-full items-center justify-end space-x-2 bg-level1 px-4 shadow-sm ">
       {sessionData?.user ? (
         <>
           <IconButton onClick={changeTheme}>

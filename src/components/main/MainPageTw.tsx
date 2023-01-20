@@ -29,10 +29,10 @@ export const tweetSchema = z.optional(object({
 const MainPageTw = () => {
   const utils = trpc.useContext();
 
-  const fileInput = useRef(null);
+  const fileInput = useRef<HTMLInputElement>(null);
   const controlHeight = useRef(null)
   const [text, setText] = useState("")
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | null | boolean>(false);
   const [file, setFile] = useState<any>(null);
 
   const { mutateAsync } = trpc.tweet.create.useMutation({
@@ -70,14 +70,16 @@ const MainPageTw = () => {
   }
 
   const selectImage = () => {
-    fileInput.current?.click();
+    if(fileInput.current){
+        fileInput.current.click();
+    }
   };
 
   async function handleSubmit(e: React.FormEvent<HTMLInputElement>) {
     e.preventDefault();
     try {
-      await tweetSchema.parse({ text })
-    } catch (er: unknown) {
+      tweetSchema.parse({ text })
+    } catch (er: any) {
       setError(er.message);
       return;
     }
@@ -135,10 +137,11 @@ const MainPageTw = () => {
           {/* login logout */}
           <AuthShowcase/>
           {/* Home */}
-          <div className='sticky  top-0 z-[3] pointer-events-auto text-[15px] bg-homeCl '>
-            <div className='h-[53px] max-w-[1000px] cursor-pointer flex p-4 w-full items-center justify-start mx-auto'>
+          <div 
+          className='sticky  top-0 z-[3] pointer-events-auto text-[15px] bg-homeCl border-b  '>
+            <div className='h-[53px] max-w-[1000px] cursor-pointer flex p-4 w-full items-center justify-start mx-auto  '>
               <h1 className='text-[20px] leading-6'>
-                <span className='block font-semibold blur-none text-black'>Home</span>
+                <div className='block font-semibold blur-none  text-black'>Home</div>
               </h1>
             </div>
           </div>
@@ -224,7 +227,7 @@ const MainPageTw = () => {
               </div>
             </div>
           </div>
-          <section className='bg-white border-t border-bordercl '>
+          <section className=' border-t border-bordercl '>
             <TweetLine where={{}}/>
           </section>
         </div>

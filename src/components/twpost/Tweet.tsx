@@ -103,7 +103,7 @@ client: QueryClient;
 
   const {mutateAsync : deleteTweet, } = trpc.tweet.deleteTweet.useMutation({
     onSuccess: async () => {
-      await utilss.tweet.timeline.invalidate();
+      await utils.tweet.timeline.invalidate();
     },
   })
   const {mutateAsync : deleteImage} = trpc.tweet.deleteImage.useMutation()
@@ -115,47 +115,104 @@ client: QueryClient;
   }
 
   const hasLike :boolean = tweet.like.length > 0;
+  console.log(tweet.author);
 
-
+  const link = tweet.author.username || tweet.author.name
   return( 
-    <div className='border-t border-bordercl pt-2'>
-      <div className='flex flex-col'>
-        <div className='flex '>
-          <Link href={`/${tweet.author.name}`}>
-          {tweet.author.image &&
-            <Image src={tweet.author.image} alt={`${tweet.author.name} profile picture`}  className='rounded-full'
-            width={40}
-            height={40} />
-          }
-          </Link>
-
-          {/* text */}
-          <div className='ml-2 '>
-          {
-            tweet.text &&
-            <div className='text-sm text-gray-600'>
-              {tweet.text}
-            </div>
-
-          }
+    <div className='css-intial border-t-1 border-bordercl pt-1 max-w-[598px] w-full z-0'>
+      <article className='px-4'>
+        <div className='flex flex-col pointer-events-auto relative shrink-0 basis-auto'>
+          {/* reply to who */}
+          <div className='css-intial pt-3'>
           </div>
-          {/* delete */}
-          <button onClick={handleDeleteTweet} className='ml-auto'> delete</button>
-        </div>
-        <div>
+          {/* actual post */}
+          <div className='flex '>
+            {/* avatar */}
+            <div className='flex basis-12 w-full mr-3 '>
+              <Link href={`/${link}`} className=" w-[48px] h-[48px]">
+                {tweet.author.image &&
+                  <Image src={tweet.author.image} alt={`${tweet.author.name} profile picture`} className='rounded-full'
+                    width={48}
+                    height={48} />
+                }
+              </Link>
+            </div>
+            {/* right side of tweet  */}
+            <div className='flex flex-col flex-wrap w-full'>
+              {/* header of the tweet ( handle  and name) */}
+              <div className='flex justify-between items-center pointer-events-auto text-[15px] w-full'>
+                <div className='flex flex-shrink max-w-full text-[15px]'>
+                  {/* name */}
+                  <Link href={"/"} className=' font-semibold hover:underline'>
+                    Thoong Le
+                  </Link>
+                  {/* handle and time */}
+                  <div className='flex text-lighttext cursor-pointer'>
+                    <div className='font-normal ml-1'>
+                      <span className=''>@ThngL73664546</span>
+                    </div>
+                    <div className='w-full h-full flex px-1 justify-center items-center content-center  text-center'>
+                      <span className='block min-h-0 h-full w-full  '>.</span>
+                    </div>
+                    <div className='hover:underline'>
+                      <span>1h</span>
+                    </div>
+                  </div>
+
+                </div>
+                {/* delete */}
+                <button onClick={handleDeleteTweet} className='ml-auto'> delete</button>
+              </div>
+              
+              {/*text, images, interactivity */}
+              <div className=''>
+                {/* text */}
+                <div className=''>
+                  {
+                    tweet.text &&
+                    <div className='text-sm text-normaltext break-word break-words'>
+                      {tweet.text}
+                    </div>
+
+                  }
+                </div>
+                {/* Images */}
+                <div className='mt-3'>
+                  <div className='flex gap-1 w-full'>
+                    <div className='flex justify-start w-full'>
+                      <div className='rounded-[16px]  w-full'>
+                        <div className='flex h-full w-full grow'>
+                          {images && images.map(image => (
+                            <Link href={"/"} key={image.id} className=' h-full cursor-pointer outline-none w-full'>
+                              <div className='overflow-hidden h-[510px] w-[382.5px] relative rounded-[16px] border-bordercl '>
+                                <div className=' pb-[133.333%] w-full '>
+                                </div>
+                                <div className='absolute w-full h-full inset-0 block border border-bordercl  '>
+                                  {/* <img src="https://pbs.twimg.com/media/Fm4RcbLaEAARBZQ?format=jpg&name=small" alt="" /> */}
+                                  <img src={image.url} alt="alt" 
+                                  className='w-full h-full' />
+                                  
+                                </div>
+                                <p>dsads</p>
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    
+                  </div>
+                </div>
+                {/* Interaction */}
+                <div>
+                  <Interaction likeFn={likeMutation} unlikeFn={unlikeMutation} tweetId={tweetId} hasLike={hasLike} twCreateAt={tweet.createdAt} likeCount={tweet._count.like} commentCount={tweet._count.comment} commentData={tweet.comment} />
+                </div>
+              </div>
+            </div>
+          </div>
           
         </div>
-        <div>
-          {images && images.map(image => (
-                <div key={image.id} className='col-span-4'>
-                  <img src={image.url} alt="alt" />
-                </div>
-              ))}
-        </div>
-      </div>
-      <div>
-        <Interaction likeFn={likeMutation} unlikeFn={unlikeMutation} tweetId={tweetId} hasLike={hasLike} twCreateAt={tweet.createdAt} likeCount={tweet._count.like} commentCount ={tweet._count.comment}  commentData={tweet.comment}   />
-      </div>
+      </article>
     </div>
   )
 }

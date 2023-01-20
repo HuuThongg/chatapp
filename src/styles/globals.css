@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 :root {
-  --background: #f7f7f7;
+  --background: #ffffff;
   --level1: #ffffff;
   --level2: #f2f2f2;
   --level3: #e8e8e8;
@@ -16,6 +16,17 @@
   --quaternaryText: #595959;
   --invertedPrimaryText: #ffffff;
   --invertedTertiaryText: #b3b3b3;
+  --lighttext:#4d5357;
+  --normaltext:rgb(15,20,25);
+  --bordercl:rgb(207, 217, 222);
+  --hoverColor: rgb(247, 240, 240);
+  --iconColor: rgb(83, 100, 113);
+  --bgCl: #fafafa;
+  --primary_bg: rgb(255,255,255);
+  --elevated_border: rgb(219,219,219);
+  --secondary_text: rgb(142, 142, 142),;
+  --bordercl: rgb(47,51,54);
+  --homeCl: rgba(255,255,255,0.85);
 }
 
 [data-theme="dark"] {
@@ -32,9 +43,53 @@
   --quaternaryText: #999999;
   --invertedPrimaryText: #000000;
   --invertedTertiaryText: #595959;
+  --lighttext:#fcfdff;
+  --normaltext:rgb(244, 245, 245);
+  --bordercl:rgb(37, 163, 225);
+  --bgCl: #fafafa;
+  --primary_bg: rgb(255,255,255);
+  --elevated_border: rgb(219,219,219);
+  --secondary_text: rgb(142, 142, 142);
+  --bordercl: rgb(47,51,54);
+  --homeCl: rgba(255,255,255,0.85);
+  --iconColor: rgb(83, 100, 113);
+
 }
 
 body {
   background-color: var(--background);
   color: var(--primaryText);
+}
+
+.canvas {
+    overflow-clip-margin: content-box;
+    overflow: clip;
+}
+/* For Webkit-based browsers (Chrome, Safari and Opera) */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+textarea::-webkit-resizer {
+  display: none;
+}
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+    outline: none;
+}
+input[type=file] {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  overflow-clip-box: padding-box;
+  color: unset;
+
+  /* Revert rules which apply on all inputs. */
+  appearance: none;
+  -moz-default-appearance: none;
+  cursor: default;
+
+  border: none;
+  background-color: transparent;
+  padding: unset;
 }

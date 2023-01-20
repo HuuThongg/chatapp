@@ -85,6 +85,7 @@ export const tweetRouter = createTRPCRouter({
               name: true,
               image: true,
               id: true,
+              username: true,
             },
           },
           _count: {

@@ -7,6 +7,8 @@ import { FiMessageSquare } from 'react-icons/fi'
 import { GrNotification } from 'react-icons/gr'
 import { HiOutlineDotsCircleHorizontal, HiOutlineDotsHorizontal } from 'react-icons/hi'
 import { HiOutlineUser } from 'react-icons/hi2'
+import { IconContext } from "react-icons";
+
 import { useSession } from "next-auth/react"
 import Image from 'next/image'
 import { PLACEHOLDER_IMAGE } from '../../constants'
@@ -43,7 +45,10 @@ const SideBar = () => {
                   </div>
                 </div>
                 {/* menu */}
-                <div className='grow basis-0 w-full'>
+                <div className='grow basis-0 w-full  '>
+
+                  
+
                   <div className=''>
                     <Link href="/" className='inline'>
                       
@@ -53,8 +58,8 @@ const SideBar = () => {
 
                       >
                         {/* logo */}
-                        <div className={`text-[24px] w-6 h-6  ${isHover ? "scale-105" : "scale-100"}`}>
-                          <AiOutlineHome />
+                        <div className={`text-[24px] w-6 h-6  ${isHover ? "scale-105" : "scale-100"}  `}>
+                          <AiOutlineHome className='' />
                         </div>
                         {/* feild */}
                         <div className='flex px-4 items-center w-fit  h-6'>

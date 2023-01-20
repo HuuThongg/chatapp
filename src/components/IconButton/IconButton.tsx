@@ -16,7 +16,6 @@ export default function IconButton({
   className,
   ...rest
 }: Props) {
-  console.log(shouldFill);
 
   return (
     <button

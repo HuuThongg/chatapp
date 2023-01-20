@@ -56,23 +56,13 @@ const TweetLine = ({where = {}}:{where: RouterInputs['tweet']['timeline']['where
   const utils = trpc.useContext();
   return (
     <div>
-      <div className='w-full pointer-events-auto relative border-b border-bordercl shrink-0 grow-0 basis-auto flex flex-col '>
-        <div className='css-intial'>
-          <article className='px-4'>
-            <div className='flex flex-col pointer-events-auto relative shrink-0 basis-auto'>
-              {/* avatar */}
-              <div className='text-lg font-bold'>
-                avatar
-
-              </div>
-              {/* tweet */}
-              {tweetData?.map((tweet) => {
-                return <Tweet key={tweet.id} tweet={tweet} input={{ where, limit:LIMITTWEETS }}  client={client} utils={utils}
-                ></Tweet>
-              })}
-            </div>
-          </article>
-        </div>
+      <div className='w-full pointer-events-auto relative border-b border-bordercl shrink-0 grow-0 basis-auto flex flex-col bg-background '>
+        
+        {tweetData?.map((tweet) => {
+          return <Tweet key={tweet.id} tweet={tweet} input={{ where, limit: LIMITTWEETS }} client={client} utils={utils}
+          ></Tweet>
+        })}
+        
       </div>
       
     </div>
