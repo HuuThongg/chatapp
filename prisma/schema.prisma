@@ -58,11 +58,11 @@ model User {
     Tweet         Tweet[]
     like Like[]
     comments Comment[]
-    username      String?
+    username      String? @default(cuid()) @unique
     theme         Theme     @default(light)
-
     messages      Message[]
     conversations ConversationUser[]
+    createdAt DateTime @default(now())
 }
 
 
@@ -74,21 +74,21 @@ model User {
 // }
 
 model Images{
-  id            String    @id @default(cuid())
-  tweet         Tweet @relation(fields: [tweetId], references: [id],onDelete: Cascade, onUpdate: Cascade)
-  tweetId       String 
+    id            String    @id @default(cuid())
+    tweet         Tweet @relation(fields: [tweetId], references: [id],onDelete: Cascade, onUpdate: Cascade)
+    tweetId       String 
 }
 
 model Tweet {
-  id        String   @id @default(cuid())
-  text      String
-  author    User     @relation(fields: [authorId], references: [id],onDelete: Cascade, onUpdate: Cascade)
-  authorId  String
-  images Images[] 
-  like Like[]
-  comment Comment[]
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+    id        String   @id @default(cuid())
+    text      String
+    author    User     @relation(fields: [authorId], references: [id],onDelete: Cascade, onUpdate: Cascade)
+    authorId  String
+    images Images[] 
+    like Like[]
+    comment Comment[]
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 model Like {
@@ -160,7 +160,6 @@ model ConversationUser {
     // lastRead DateTime?
     user           User         @relation(fields: [userId], references: [id])
     conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-
     @@unique([userId, conversationId])
     @@index([conversationId])
 }

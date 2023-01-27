@@ -1,6 +1,11 @@
 import { z } from "zod";
+import { User } from "@prisma/client";
 
 import { createTRPCRouter, publicProcedure, protectedProcedure } from "../trpc";
+
+
+
+
 
 export const userRouter = createTRPCRouter({
   hello: publicProcedure
@@ -13,6 +18,13 @@ export const userRouter = createTRPCRouter({
 
   getSecretMessage: protectedProcedure.query(() => {
     return "you can now see this secret message!";
+  }),
+  getUserInfo: protectedProcedure.query(({ctx}) => {
+    return ctx.prisma.user.findFirst({
+      where: {
+        name: "Huu",
+      }
+    }) 
   }),
   changeUserTheme: protectedProcedure
     .input(z.object({ theme: z.enum(["light", "dark"]) }))

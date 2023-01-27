@@ -4,7 +4,13 @@ import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "next-themes";
 import { api } from "../utils/api";
 import "../styles/globals.css";
+import {Inter} from "@next/font/google"
 
+const mainFont = Inter({
+  subsets : ["latin"],
+  variable : "--font-main-font",
+  display: 'optional'
+})
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
@@ -13,7 +19,9 @@ const MyApp: AppType<{ session: Session | null }> = ({
   return (
     <ThemeProvider defaultTheme="light">
       <SessionProvider session={session}>
-        <Component {...pageProps} />
+        {/* <div className={`${mainFont.variable} font-sans`}> */}
+          <Component {...pageProps} />
+        {/* </div> */}
       </SessionProvider>
     </ThemeProvider>
   );

@@ -1,12 +1,48 @@
-import React from 'react'
+import React, {useState} from 'react'
 import { useRouter } from 'next/router';
 import { SideBar } from '../components/sidebar';
 import { FiArrowLeft } from 'react-icons/fi'
+import { HiOutlineEllipsisHorizontal, HiOutlineEnvelope, HiOutlineBellAlert, HiOutlineCalendarDays } from "react-icons/hi2"
 import Image from 'next/image'
+
+import { TweetLine } from '../components/twpost';
+import dayjs from 'dayjs'
+import relativeTime from "dayjs/plugin/relativeTime";
+import updateLocal from "dayjs/plugin/updateLocale";
+import { api } from '../utils/api';
+
+dayjs.extend(relativeTime);
+dayjs.extend(updateLocal);
+
+dayjs.updateLocale("en", {
+  relativeTime: {
+    future: "in %s",
+    past: "%s",
+    s: "1m",
+    m: "1m",
+    mm: "%dm",
+    h: "1h",
+    hh: "%dh",
+    d: "1d",
+    dd: "%dd",
+    M: "1M",
+    MM: "%dM",
+    y: "1y",
+    yy: "%dy",
+  },
+});
+
+
+
 const PersonalPage = () => {
+  const {data: userInfo}= api.user.getUserInfo.useQuery();
+  console.log("userInfo",userInfo);
   const router = useRouter();
   // handle is like @Thngle#3215
   const handle= router.query.name as string;
+
+  const [isHover, setIsHover] = useState(false)
+
   return (
     <div className="z-0 box-border w-full h-full relative" >
       <div className="flex flex-col relative z-0 min-h-screen bg-bgcl">
@@ -38,8 +74,6 @@ const PersonalPage = () => {
                     </div>
                   </div>
                 </div>
-
-
                 {/* content */}
                 <div className='flex flex-col flex-grow max-w-[600px] w-full mx-auto'>
                   {/* Profile and INfo */}
@@ -71,6 +105,68 @@ const PersonalPage = () => {
                               className='w-full h-full rounded-full border-4' 
                               />
                         </div>
+                        {/* follow */}
+                        <div className='flex justify-start flex-wrap items-end max-w-full  '>
+                          {/* more */}
+                          <div className='flex min-w-[36px] min-h-[36px] outline-none bg-bgicon mb-3 mr-2  rounded-full border cursor-pointer border-bordercl h-full hover:bg-hoverIconBgCl'>
+                            <div className='flex flex-col justify-center items-center  flex-grow'>
+                              <HiOutlineEllipsisHorizontal className='block text-normaltext text-[20px] font-bold'/>
+                            </div>
+                          </div>
+                          {/* mail */}
+                          <div className='flex min-w-[36px] min-h-[36px] outline-none bg-bgicon mb-3 mr-2  rounded-full border cursor-pointer border-bordercl h-full hover:bg-hoverIconBgCl'>
+                            <div className='flex flex-col justify-center items-center  flex-grow'>
+                              <HiOutlineEnvelope className='block text-normaltext text-[20px] font-bold' />
+                            </div>
+                          </div>
+
+                          {/* notificatons */}
+                          <div className='flex min-w-[36px] min-h-[36px] outline-none bg-bgicon mb-3 mr-2  rounded-full border cursor-pointer border-bordercl h-full hover:bg-hoverIconBgCl'>
+                            <div className='flex flex-col justify-center items-center  flex-grow'>
+                              <HiOutlineBellAlert className='block text-normaltext text-[20px] font-bold' />
+                            </div>
+                          </div>
+                          {/* following */}
+                          <div className='min-w-[102px]  mb-3'>
+                            <div className={`min-w-[36px] min-h-[36px] outline-none bg-bgicon select-none px-4 rounded-full border border-bordercl hover:bg-hoverIconBgCl flex items-center ${isHover ? "hover:bg-bgClWarning" :""} `} onMouseEnter={() => setIsHover(true)}
+                              onMouseLeave={() => setIsHover(false)}
+                            >
+
+                              {isHover ? <span className={`capitalize text-[15px] text-textWarn `}>Unfollow</span> : <span className='capitalize text-[15px] '>Following</span>}
+                              
+
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      {/* handle and name */}
+                      <div className='mb-3'>
+                        <div className='flex flex-col text-[20px]  tracking tracking-wide'>
+                          <div className='shrink'>
+                            <span className='break-word font-bold'>{handle}</span>
+                          </div >
+
+                          <div className='shrink leading-3'>
+                            <span className=' text-[15px] text-lighttext tracking-tight font-normal'>@{handle}</span>
+                          </div>
+                        </div>
+                      </div>
+                      {/* address link time joined */}
+                      <div className='flex mb-3'>
+                        <div className='leading-3 text-normaltext font-normal text-[15px] break-words min-w-0  whitespace-pre'>
+                          {/* country */}
+                          <span></span>
+                          {/* url: blogs */}
+                          <span className='text-iconColor mr-3 break-words min-w-0 flex space-x-2'>
+                            <span>
+
+                              <HiOutlineCalendarDays />
+                            </span>
+                            <span>
+                              Joined {dayjs(userInfo?.createdAt).format(' MMM  YYYY')}
+                            </span>
+                          </span>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -78,6 +174,13 @@ const PersonalPage = () => {
                     Navigation
                   </div>
                 </div>
+
+
+                <TweetLine where={{
+                  author: {
+                    name: handle
+                  }
+                }} />
               </div>
             </div>
           </main>

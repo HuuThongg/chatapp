@@ -4,7 +4,8 @@
 
 :root {
   --background: #ffffff;
-  --level1: #ffffff;
+  --tweet: #0000004C;
+  --tweetHoverCl: #0000004C;
   --level2: #f2f2f2;
   --level3: #e8e8e8;
   --level4: #dedede;
@@ -19,19 +20,26 @@
   --lighttext:#4d5357;
   --normaltext:rgb(15,20,25);
   --bordercl:rgb(207, 217, 222);
+  --hoverIconBgCl:rgba(15, 20, 25,0.1);
+
   --hoverColor: rgb(247, 240, 240);
   --iconColor: rgb(83, 100, 113);
   --bgCl: #fafafa;
   --primary_bg: rgb(255,255,255);
   --elevated_border: rgb(219,219,219);
   --secondary_text: rgb(142, 142, 142),;
-  --bordercl: rgb(47,51,54);
   --homeCl: rgba(255,255,255,0.85);
+  --bgicon:  rgba(0,0,0,0);
+  --borderWarn:rgba(253,201,206);
+  --bgClWarning: rgba(244,33,46,0.1);
+  --textWarn: rgba(244,33,46);
+
 }
 
 [data-theme="dark"] {
   --background: #0d0d0d;
-  --level1: #1a1a1a;
+  --tweet: #0000004C;
+  --tweetHoverCl: #0000004C;
   --level2: #242424;
   --level3: #3b3b3b;
   --level4: #4d4d4d;
@@ -53,7 +61,6 @@
   --bordercl: rgb(47,51,54);
   --homeCl: rgba(255,255,255,0.85);
   --iconColor: rgb(83, 100, 113);
-
 }
 
 body {

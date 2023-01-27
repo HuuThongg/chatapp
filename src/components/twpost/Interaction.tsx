@@ -76,7 +76,7 @@ const Interaction = ({ tweetId, likeFn, unlikeFn, hasLike, twCreateAt, likeCount
   }
   return (
     <div className='shrink-0 grow-0 basis-auto  flex flex-col justify-start '>
-      <div className=' rounded-lg pointer-events-auto relative bg-primary_bg '>
+      <div className=' rounded-lg pointer-events-auto relative '>
         <div className='flex flex-col min-w-[335px] w-full'>
           {/* reactions */}
           <section className='flex justify-between mt-3  pb-[6px] pointer-events-auto max-w-[425px] gap-y-2  text-iconColor'>
@@ -97,7 +97,7 @@ const Interaction = ({ tweetId, likeFn, unlikeFn, hasLike, twCreateAt, likeCount
                   <FiMessageSquare />
                 </div>
               <div>
-                <span className='text-[13px] leading-[16px] text-iconColor'>16</span>
+                <span className='text-[13px] leading-[16px] text-iconColor'>{commentCount}</span>
               </div>
               </div>
 
@@ -207,10 +207,10 @@ const Interaction = ({ tweetId, likeFn, unlikeFn, hasLike, twCreateAt, likeCount
           </div> */}
 
           {/* add comments */}
-          <section className='px-3 py-1 border-t border-solid border-separate border-neutral-300 text-[14px] shrink-0 text-secondary_text relative'>
+          <section className='px-3 py-1 border-t border-solid border-separate border-neutral-300 text-[14px] shrink-0 text-secondary_text relative '>
             <div>
               <form action="" className=' flex boder-0 border-none m-0 p-0 relative align-baseline' >
-                <textarea className=' h-[18px] b grow-border-none outline-none resize-none active:border-none active:outline-none text-start whitespace-pre-wrap w-full rounded-none text-slate-700 appearance-none' placeholder='Add a comment...' onChange={(e) => setText(e.target.value)} value={text} onKeyUp={handleSubmitComment}>
+                <textarea className=' h-[18px]  grow-border-none outline-none resize-none active:border-none active:outline-none text-start whitespace-pre-wrap w-full rounded-none text-slate-700 appearance-none' placeholder='Add a comment...' onChange={(e) => setText(e.target.value)} value={text} onKeyUp={handleSubmitComment}>
 
                 </textarea>
 

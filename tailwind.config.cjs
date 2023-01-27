@@ -1,11 +1,15 @@
+const defaultTheme = require("tailwindcss/defaultTheme")
+
 /** @type {import('tailwindcss').Config} */
+
 module.exports = {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
       colors: {
         background: "var(--background)",
-        level1: "var(--level1)",
+        tweetHoverCl: "var(--tweetHoverCl)",
+        level1: "var(--tweetHoverCl)",
         level2: "var(--level2)",
         level3: "var(--level3)",
         level4: "var(--level4)",
@@ -27,7 +31,16 @@ module.exports = {
         secondary_text: "var(--secondary_text)",
         bordercl: "var(--bordercl)",
         homeCl: "var(--homecl)",
-        iconColor:"var(--iconColor)"
+        iconColor: "var(--iconColor)",
+        bgicon: "var(--bgicon)",
+        hoverIconBgCl: "var(--hoverIconBgCl)",
+        borderWarn: "var(--borderWarn)",
+        bgClWarning: "var(--bgClWarning)",
+        textWarn: "var(--textWarn)",
+      },
+      fontFamily: {
+        sans: ["var(--font-inter)", ...defaultTheme.fontFamily.sans],
+        mono: ["var(--font-roboto-mono)", ...defaultTheme.fontFamily.mono],
       },
     },
   },
