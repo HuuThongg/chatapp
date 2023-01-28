@@ -7,6 +7,8 @@ import {api as trpc } from '../../utils/api';
 import Interaction from './Interaction';
 import Image from 'next/image'
 import dayjs from 'dayjs'
+import { useSession } from "next-auth/react"
+import { useRouter } from 'next/router'
 
 function updateCache({
   client,
@@ -85,6 +87,8 @@ client: QueryClient;
 }){
   const utils = trpc.useContext();
 
+  const { data: sessionData } = useSession();
+
   const tweetId : string = tweet.id;
   // const { data: images } = trpc.tweet.getImagesForUser.useQuery({ tweetId });
   const { data: images, isFetched } = trpc.tweet.getImagesForUser.useQuery({ tweetId });
@@ -108,7 +112,8 @@ client: QueryClient;
     },
   })
   const {mutateAsync : deleteImage} = trpc.tweet.deleteImage.useMutation()
-  const handleDeleteTweet =async () =>{
+  const handleDeleteTweet =async (e: { stopPropagation: () => void; }) =>{
+    e.stopPropagation();
     await Promise.all([
       deleteTweet({ tweetId }),
       deleteImage({ tweetId })
@@ -119,10 +124,16 @@ client: QueryClient;
   // console.log(tweet.author);
 
   const link = tweet.author.username || tweet.author.name
-  
+  const router = useRouter();
+  function handleTweetClick(e ){
+    e.preventDefault();
+    router.push(`/status/${tweetId}`)
+  }
   return( 
     <div className='css-intial border-t-1 border-bordercl pt-1 max-w-[598px] w-full z-0'>
-      <article className='px-4  hover:bg-tweetHoverCl cursor-pointer'>
+      <article className='px-4  hover:bg-tweetHoverCl cursor-pointer'
+        onClick={handleTweetClick}
+      >
         <div className='flex flex-col pointer-events-auto relative shrink-0 basis-auto'>
           {/* reply to who */}
           <div className='css-intial pt-3'>
@@ -130,7 +141,9 @@ client: QueryClient;
           {/* actual post */}
           <div className='flex '>
             {/* avatar */}
-            <div className='flex basis-12 w-full mr-3 '>
+            <div className='flex basis-12 w-full mr-3 '
+              onClick={(e)=>e.stopPropagation() }
+            >
               <Link href={`/${link!}`} className=" w-[48px] h-[48px]">
                 {tweet.author.image &&
                   <Image src={tweet.author.image} alt={`${tweet.author.name} profile picture`} className='rounded-full'
@@ -143,25 +156,28 @@ client: QueryClient;
             <div className='flex flex-col flex-wrap w-full'>
               {/* header of the tweet ( handle  and name) */}
               <div className='flex justify-between items-center pointer-events-auto text-[15px] w-full '>
-                <div className='flex flex-shrink max-w-full text-[15px]'>
+                <div className='flex flex-shrink max-w-full text-[15px] ' onClick={(e) => e.stopPropagation() }>
                   {/* name */}
-                  <Link href={`/${tweet.author.name}`} className=' font-semibold hover:underline '>
-                    Thoong Le
+                  <Link href={`/${tweet.author.username}`} className=' font-semibold hover:underline '>
+                    {tweet.author.name}
                   </Link>
                   {/* handle and time */}
                   <div className='flex text-lighttext cursor-pointer'>
-                    <Link href={`/${tweet.author.name}` 
+                    <Link href={`/${tweet.author.username!}` 
                       }
                       className="flex"
                       >
                       <div className='font-normal ml-1'>
-                        <span className=''>@ThngL73664546</span>
+                        <span className=''>                    @{tweet.author.username}
+                        </span>
                       </div>
                       <div className='w-full flex px-1 justify-center items-center content-center  text-center'>
                         <span className=' min-h-0  w-full  '>.</span>
                       </div>
                     </Link>
-                    <div className='hover:underline'>
+                    <div className='hover:underline'
+                      onClick={handleTweetClick}
+                    >
                       <span>{dayjs(tweet.createdAt).fromNow()}</span>
                     </div>
                   </div>

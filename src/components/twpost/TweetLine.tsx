@@ -6,31 +6,10 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 
+import { useScrollPosition } from '../../hooks/useScrollPosition';
+
 const LIMITTWEETS = 3;
 
-function useScrollPosition() {
-  const [scrollPosition, setScrollPosition] = useState(0);
-
-  const handleScroll = () => {
-    const height =
-      document.documentElement.scrollHeight -
-      document.documentElement.clientHeight;
-    const winScroll =
-      document.documentElement.scrollTop;
-    const scrolled = (winScroll / height) * 100;
-    setScrollPosition(scrolled);
-  };
-
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll, { passive: true });
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
-  return scrollPosition;
-}
 
 const TweetLine = ({where = {}}:{where: RouterInputs['tweet']['timeline']['where']}) => {
   const scrollPosition = useScrollPosition();
@@ -40,7 +19,7 @@ const TweetLine = ({where = {}}:{where: RouterInputs['tweet']['timeline']['where
   },{
     getNextPageParam: (lastPage)=> lastPage.nextCursor 
   })
-
+  
   // refetchSingleTweet();
   useEffect(() => {
     if (scrollPosition > 90 && hasNextPage && !isFetching) {
@@ -54,6 +33,7 @@ const TweetLine = ({where = {}}:{where: RouterInputs['tweet']['timeline']['where
   const  tweetData = data?.pages.flatMap((page)=>page.tweets) ??[];
 
   const utils = trpc.useContext();
+
   return (
     <div>
       <div className='w-full pointer-events-auto relative border-b border-bordercl shrink-0 grow-0 basis-auto flex flex-col bg-background '>

@@ -81,8 +81,9 @@ const Interaction = ({ tweetId, likeFn, unlikeFn, hasLike, twCreateAt, likeCount
           {/* reactions */}
           <section className='flex justify-between mt-3  pb-[6px] pointer-events-auto max-w-[425px] gap-y-2  text-iconColor'>
               <div className='flex justify-center items-center -ml-2 '>
-                <div className='cursor-pointer bg-transparent flex justify-center items-center p-2 text-[18.5px] '
-                  onClick={() => {
+              <div className={`cursor-pointer bg-transparent flex justify-center items-center p-2 text-[18.5px] rounded-full ${hasLike ? "hover:bg-interHoverIconActive" : "hover:bg-interHoverIcon"} `}
+                  onClick={(e) => {
+                    e.stopPropagation();
                     !hasLike ? likeFn({ tweetId }) : unlikeFn({ tweetId })
                   }} 
                 >
@@ -93,12 +94,14 @@ const Interaction = ({ tweetId, likeFn, unlikeFn, hasLike, twCreateAt, likeCount
                 </div>
               </div>
               <div className='flex justify-center items-center '>
-                <div className='cursor-pointer bg-transparent flex justify-center items-center p-2 text-[18.5px] '>
+                <div className={`cursor-pointer bg-transparent flex justify-center items-center p-2 text-[18.5px] rounded-full ${hasComment  ? "hover:bg-interHoverIconActive" : "hover:bg-interHoverIcon"} `}>
                   <FiMessageSquare />
                 </div>
-              <div>
-                <span className='text-[13px] leading-[16px] text-iconColor'>{commentCount}</span>
-              </div>
+              {hasComment &&   
+                <div>
+                  <span className='text-[13px] leading-[16px] text-iconColor'>{commentCount}</span>
+                </div>
+              }
               </div>
 
               <div className='flex justify-center items-center '>
@@ -125,34 +128,6 @@ const Interaction = ({ tweetId, likeFn, unlikeFn, hasLike, twCreateAt, likeCount
           
           {/* content */}
           <div className=' mx-0 mt-0 mb-auto px-3 overflow-auto relative'>
-            {/* <div className='shrink-0 grow-0 basis-auto flex flex-col justify-start relative mb-1'>
-              <div className=' flex-auto min-h-0 min-w-0 relative'>
-                <span className='inline relative'>
-                  <Link href="#" className='font-semibold inline'>huuthong</Link>
-                  { } Javascript is everywhere. Millions of webpages are built on JS.
-                </span>
-                <span className='inline'>
-                  <span>
-                    <br />
-
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Illum suscipit illo, commodi minus laborum
-                    <br />
-                    <br />
-                    Lorem ipsum dolor sit amet consectetur, adipisicing elit. Beatae, aut!
-                    <br />
-                    <br />
-                  </span>
-                  <span className=''>
-                    ...&nbsp;
-                    <div className='cursor-pointer text-[14px] pointer-events-auto font-normal inline'>
-                      <div className='inline'>
-                        more
-                      </div>
-                    </div>
-                  </span>
-                </span>
-              </div>
-            </div> */}
             {/* comments */}
             {/* view all  comments */}
             {hasComment && 

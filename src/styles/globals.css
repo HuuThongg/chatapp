@@ -5,7 +5,7 @@
 :root {
   --background: #ffffff;
   --tweet: #0000004C;
-  --tweetHoverCl: #0000004C;
+  --tweetHoverCl: rgba(0,0,0,0.03);
   --level2: #f2f2f2;
   --level3: #e8e8e8;
   --level4: #dedede;
@@ -19,9 +19,8 @@
   --invertedTertiaryText: #b3b3b3;
   --lighttext:#4d5357;
   --normaltext:rgb(15,20,25);
-  --bordercl:rgb(207, 217, 222);
+  --bordercl:rgb(239, 243, 244);
   --hoverIconBgCl:rgba(15, 20, 25,0.1);
-
   --hoverColor: rgb(247, 240, 240);
   --iconColor: rgb(83, 100, 113);
   --bgCl: #fafafa;
@@ -33,7 +32,11 @@
   --borderWarn:rgba(253,201,206);
   --bgClWarning: rgba(244,33,46,0.1);
   --textWarn: rgba(244,33,46);
-
+  /* b */
+  --interHoverIcon: rgba(29,155,240,0.1);
+  --interHoverIconActive: rgba(249,24,128,0.1); 
+  --iconFIllActive: rgb(29,155,240);
+  --iconFIll:rgba(83,100,113);
 }
 
 [data-theme="dark"] {
@@ -61,6 +64,8 @@
   --bordercl: rgb(47,51,54);
   --homeCl: rgba(255,255,255,0.85);
   --iconColor: rgb(83, 100, 113);
+  --interHoverIcon: rgba(29,155,240,0.1);
+  --interHoverIconActive: rgba(249,24,128,0.1); 
 }
 
 body {

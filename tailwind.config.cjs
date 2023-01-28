@@ -37,6 +37,10 @@ module.exports = {
         borderWarn: "var(--borderWarn)",
         bgClWarning: "var(--bgClWarning)",
         textWarn: "var(--textWarn)",
+        interHoverIcon: "var(--interHoverIcon)",
+        interHoverIconActive: "var(--interHoverIconActive)",
+        iconFIll: "var(--iconFIll)",
+        iconFIllActive: "var(--iconFIllActive)",
       },
       fontFamily: {
         sans: ["var(--font-inter)", ...defaultTheme.fontFamily.sans],

@@ -41,7 +41,7 @@ export const tweetRouter = createTRPCRouter({
       })
       .then((tweet) => ({ tweetId: tweet.id }));
   }),
-  
+
   timeline: publicProcedure
     .input(
       z.object({
@@ -49,7 +49,7 @@ export const tweetRouter = createTRPCRouter({
           .object({
             author: z
               .object({
-                name: z.string().optional(),
+                id: z.string().optional(),
               })
               .optional(),
           })
@@ -124,6 +124,57 @@ export const tweetRouter = createTRPCRouter({
         tweets,
         nextCursor,
       };
+    }),
+  getSingleTweet: publicProcedure
+    .input(z.object({ tweetId: z.string() }))
+    .query( async ({ctx,input})=>{
+
+      return await ctx.prisma.tweet.findUnique({
+        where: {
+          id: input.tweetId,
+        },
+        select: {
+          // like: {
+          //   where: {
+          //     userId,
+          //   },
+          //   select: {
+          //     userId: true,
+          //   },
+          // },
+          id: true,
+          text: true,
+          author: {
+            select: {
+              name: true,
+              image: true,
+              id: true,
+              username: true,
+            },
+          },
+          _count: {
+            select: {
+              like: true,
+              comment: true,
+            },
+          },
+          comment: {
+            select: {
+              text: true,
+              id: true,
+              user: {
+                select: {
+                  image: true,
+                  name: true,
+                },
+              },
+              createdAt: true,
+              updatedAt: true,
+            },
+          },
+          createdAt: true,
+        },
+      });
     }),
   createPresignedUrl: protectedProcedure
     .input(z.object({ tweetId: z.string(), n: z.number() }))
@@ -206,7 +257,7 @@ export const tweetRouter = createTRPCRouter({
           tweetId: tweetId,
         },
       });
-
+      if(images.length < 1) return null;
       const extendedImages = await Promise.all(
         images.map(async (image) => {
           return {

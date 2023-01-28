@@ -5,16 +5,10 @@ import { useEffect } from "react"
 import  useOnChange  from "../hooks/useOnChange"
 import { api } from "../utils/api";
 
-
 import { SideBar } from "../components/sidebar";
 import { MainPageTw } from '../components/main'
 
-
-
-
-
 const  Home: NextPage = () => {
-  const {data} = api.chat.hello.useQuery({ text: " there, welcome to the chat app" });
   const {
     values: { name, username, image },
     setValues,
@@ -56,9 +50,6 @@ const  Home: NextPage = () => {
           </div>
         </div>
       </div>
-      
-      
-            
     </>
   );
 };

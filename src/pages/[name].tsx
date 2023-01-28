@@ -36,7 +36,6 @@ dayjs.updateLocale("en", {
 
 const PersonalPage = () => {
   const {data: userInfo}= api.user.getUserInfo.useQuery();
-  console.log("userInfo",userInfo);
   const router = useRouter();
   // handle is like @Thngle#3215
   const handle= router.query.name as string;
@@ -58,7 +57,9 @@ const PersonalPage = () => {
                   <div className='h-[53px] max-w-[1000px] cursor-pointer flex  w-full items-center justify-between   px-4 mx-auto'>
                     {/* back */}
                     <div className=' min-w-[56px] min-h-[32px] flex '>
-                      <div className='min-w-[36px] min-h-[36px] flex justify-start items-center'>
+                      <div className='-ml-2 min-w-[36px] min-h-[36px] flex justify-center rounded-full items-center hover:bg-hoverIconBgCl'
+                        onClick={() => router.back()}
+                      >
                         <FiArrowLeft className='text-[20px]'/>
                       </div>
                     </div>
@@ -176,9 +177,14 @@ const PersonalPage = () => {
                 </div>
 
 
-                <TweetLine where={{
+                {/* <TweetLine where={{
                   author: {
                     name: handle
+                  }
+                }} /> */}
+                <TweetLine where={{
+                  author: {
+                    id: userInfo?.id
                   }
                 }} />
               </div>

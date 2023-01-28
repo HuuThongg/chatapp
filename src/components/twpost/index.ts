@@ -1,2 +1,3 @@
 import TweetLine from "./TweetLine";
-export { TweetLine };
+import SingleTweet from "./SingleTweet";
+export { TweetLine, SingleTweet };

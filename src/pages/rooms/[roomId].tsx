@@ -9,6 +9,7 @@ function MessageItem({message,session}:{message: Message,session: Session}){
 
   const baseStyles = "mb-4 text-md w-7/12 p-4 text-gray-700 border border-gray-700 rounded-md"
   const liStyles = message.sender.name === session.user?.name ? baseStyles : baseStyles.concat("self-end bg-gray-700 text-white")
+  
   return (
     <li className={liStyles}>
       <div className='flex'>

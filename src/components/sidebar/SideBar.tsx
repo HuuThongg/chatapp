@@ -12,11 +12,14 @@ import { IconContext } from "react-icons";
 import { useSession } from "next-auth/react"
 import Image from 'next/image'
 import { PLACEHOLDER_IMAGE } from '../../constants'
+
+
 const SideBar = () => {
-  const {data} = useSession();
+  const { data: sessionData } = useSession();
   let profileSrc;
-  if(data?.user){
-    profileSrc=data?.user?.image
+  if (sessionData?.user){
+    profileSrc = sessionData?.user?.image
+    
   }
   else{
     profileSrc = PLACEHOLDER_IMAGE;
@@ -178,10 +181,14 @@ const SideBar = () => {
                     />
                   </div>
                   {/* handle */}
-                  <div className='outline-none grow  shrink text-[15px] cursor-pointer  flex flex-col basis-auto'>
+                  <div className='outline-none grow  shrink text-[15px] cursor-pointer  flex flex-col basis-auto max-w-[160px]'>
                     <div className='mx-3'>
-                      <div className='font-semibold'>Huuthong</div>
-                      <div className='w-full font-light text-secondary_text'>@ThngL424</div>
+                      <div className='font-semibold'>{sessionData?.user?.name}</div>
+                      <div className='w-full font-light text-secondary_text'>
+                        <span className='block w-full overflow-hidden whitespace-nowrap text-ellipsis'>
+                          @{sessionData?.user?.username}
+                        </span>
+                      </div>
                     </div>
                   </div>
                   <div className='  flex justify-center items-center'>
