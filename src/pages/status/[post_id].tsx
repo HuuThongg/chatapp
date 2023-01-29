@@ -1,10 +1,10 @@
 import React from 'react'
 import { FiArrowLeft } from "react-icons/fi"
 import { SideBar } from '../../components/sidebar'
-import { SingleTweet } from '../../components/twpost'
 import { useRouter } from 'next/router'
 import Tweet from '../../components/twpost/Tweet'
 import { api } from '../../utils/api'
+import SingleTweet from '../../components/singleTweet/SingleTweet'
 
 
 const LIMITTWEETS = 3;
@@ -13,7 +13,6 @@ const Ten = () => {
   const router = useRouter();
   const tweetId = router.query.post_id as string;
   const { data: tweet } = api.tweet.getSingleTweet.useQuery({ tweetId })
-  console.log("tweetId: " + tweetId)
   return (
     <div className="z-0 box-border w-full h-full relative" >
       <div className="flex flex-col relative z-0 min-h-screen bg-bgcl">

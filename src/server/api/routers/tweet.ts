@@ -1,6 +1,6 @@
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 import { z } from "zod";
-import {env} from "../../../../src/env/server.mjs"
+import { env } from "../../../../src/env/server.mjs";
 import S3 from "aws-sdk/clients/s3";
 
 export const tweetSchema = z.optional(
@@ -49,7 +49,7 @@ export const tweetRouter = createTRPCRouter({
           .object({
             author: z
               .object({
-                id: z.string().optional(),
+                id: z.string(),
               })
               .optional(),
           })
@@ -62,8 +62,14 @@ export const tweetRouter = createTRPCRouter({
       const { prisma } = ctx;
       const { cursor, limit, where } = input;
       const userId = ctx.session?.user?.id;
+      
       const tweets = await prisma.tweet.findMany({
         take: limit + 1,
+        // where: {
+        //   author: {
+        //     id: userId,
+        //   },
+        // },
         where,
         orderBy: {
           createdAt: "desc",
@@ -127,21 +133,13 @@ export const tweetRouter = createTRPCRouter({
     }),
   getSingleTweet: publicProcedure
     .input(z.object({ tweetId: z.string() }))
-    .query( async ({ctx,input})=>{
-
+    .query(async ({ ctx, input }) => {
       return await ctx.prisma.tweet.findUnique({
         where: {
           id: input.tweetId,
         },
         select: {
-          // like: {
-          //   where: {
-          //     userId,
-          //   },
-          //   select: {
-          //     userId: true,
-          //   },
-          // },
+          
           id: true,
           text: true,
           author: {
@@ -257,7 +255,7 @@ export const tweetRouter = createTRPCRouter({
           tweetId: tweetId,
         },
       });
-      if(images.length < 1) return null;
+      if (images.length < 1) return null;
       const extendedImages = await Promise.all(
         images.map(async (image) => {
           return {
@@ -311,6 +309,7 @@ export const tweetRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const userId = ctx.session.user.id;
       const { prisma } = ctx;
+      
       return prisma.like.create({
         data: {
           tweet: {

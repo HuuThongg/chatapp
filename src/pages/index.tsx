@@ -20,7 +20,7 @@ const  Home: NextPage = () => {
   const changeUserData = (event: React.SyntheticEvent) => {
     event.preventDefault();
     changeUserDataMutation.mutate({
-      name: name || undefined,
+      name: name || undefined, 
       username: username || undefined,
       image: image || undefined,
     });

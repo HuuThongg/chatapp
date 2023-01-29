@@ -5,129 +5,39 @@ import { HiEllipsisHorizontal } from "react-icons/hi2"
 import { api } from '../../utils/api';
 import dayjs from 'dayjs'
 import { FiHeart, FiMessageSquare, FiSend, FiBookmark } from 'react-icons/fi'
-import { util } from 'prettier';
-
-// function updateCache({
-//   client,
-//   variables,
-//   data,
-//   action,
-//   input,
-// }: {
-//   client: QueryClient;
-//   // input: RouterInputs["tweet"]["timeline"];
-//   variables: {
-//     tweetId: string;
-//   };
-//   data: {
-//     userId: string;
-//   };
-//   action: "like" | "unlike";
-//   input: RouterInputs["tweet"]["timeline"];
-// }) {
-//   client.setQueryData(
-//     [
-//       ["tweet", "timeline"],
-//       {
-//         // input: {
-//         //   limit: 3,
-//         //   where:{},
-//         // },
-//         input,
-//         type: "infinite",
-//       },
-//     ],
-//     (oldData) => {
-//       // console.log("oldData",oldData);
-//       const newData = oldData as InfiniteData<
-//         RouterOutputs["tweet"]["timeline"]
-//       >;
-
-//       const value = action === "like" ? 1 : -1;
-
-//       const newTweets = newData.pages.map((page) => {
-//         return {
-//           tweets: page.tweets.map((tweet) => {
-//             if (tweet.id === variables.tweetId) {
-//               return {
-//                 ...tweet,
-//                 like: action === "like" ? [data.userId] : [],
-//                 _count: {
-//                   like: tweet._count.like + value,
-//                 },
-//               };
-//             }
-
-//             return tweet;
-//           }),
-//         };
-//       });
-//       const a = { ...newData, page: newTweets }
-//       console.log(a)
-//       return {
-//         ...newData,
-//         pages: newTweets,
-//       };
-//     }
-//   );
-// }
-
-// function useScrollPosition() {
-//   const [scrollPosition, setScrollPosition] = useState(0);
-
-//   const handleScroll = () => {
-//     const height =
-//       document.documentElement.scrollHeight -
-//       document.documentElement.clientHeight;
-//     const winScroll =
-//       document.documentElement.scrollTop;
-//     const scrolled = (winScroll / height) * 100;
-//     setScrollPosition(scrolled);
-//   };
-
-//   useEffect(() => {
-//     window.addEventListener("scroll", handleScroll, { passive: true });
-
-//     return () => {
-//       window.removeEventListener("scroll", handleScroll);
-//     };
-//   }, []);
-
-//   return scrollPosition;
-// }
-const LIMITTWEETS = 3;
+import {
+  useQueryClient,
+} from "@tanstack/react-query";
+import Comment from './Comment';
+import { useRouter } from 'next/router';
+import { useSession } from 'next-auth/react';
+const LIMITTWEETS = 5;
 
 const SingleTweet = ({ tweetId }:{tweetId: string}) => {
+  const { data: sessionData } = useSession();
+  const [text, setText] = useState("")
+  const router = useRouter();
   const utils = api.useContext();
+  const client = useQueryClient();
+  const { data: images } = api.tweet.getImagesForUser.useQuery({ tweetId });
 
-  console.log("before get Imgaers" , tweetId);
-  const { data: images, isFetched } = api.tweet.getImagesForUser.useQuery({ tweetId });
 
-  
-
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   const likeMutation: (variables: { tweetId: string }) => void = api.tweet.like.useMutation({
-    // onSuccess: (data, variables) => {
-    //   updateCache({ client, variables, data, action: "like", input });
-    // },
     onSuccess:() =>{
       void utils.tweet.getSingleTweet.invalidate();
     },
-  }).mutateAsync;
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  }).mutate;
+  
   const unlikeMutation: (variables: { tweetId: string }) => void = api.tweet.unlike.useMutation({
-    // onSuccess: (data, variables) => {
-    //   updateCache({ client, data, variables, action: "unlike", input });
-    // },
     onSuccess: () => {
       void utils.tweet.getSingleTweet.invalidate();
     },
-  }).mutateAsync;
+  }).mutate;
 
   const { mutateAsync: deleteTweet, } = api.tweet.deleteTweet.useMutation({
-    // onSuccess: async () => {
-    //   await api.tweet.timeline.invalidate();
-    // },
+    onSuccess: async () => {
+      // await api.tweet.timeline.invalidate();
+    },
   })
   const { mutateAsync: deleteImage } = api.tweet.deleteImage.useMutation()
   const handleDeleteTweet = async (e: { stopPropagation: () => void; }) => {
@@ -136,10 +46,26 @@ const SingleTweet = ({ tweetId }:{tweetId: string}) => {
       deleteTweet({ tweetId }),
       deleteImage({ tweetId })
     ]);
+    router.push(`/${sessionData?.user?.username}`)
   }
+  const { mutateAsync: createCommentFn } = api.tweet.createComment.useMutation({
+    onSuccess: () => {
+      setText("")
+      void utils.comment.getComments.invalidate();
+    }
+  });
+
+  const handleSubmitComment = (e: React.FormEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      createCommentFn({ text, tweetId })
+    }
+  }
+
 
   // const scrollPosition = useScrollPosition();
   const { data:tweet } = api.tweet.getSingleTweet.useQuery({ tweetId})
+  console.log(tweet)
   // const { data : tweet, hasNextPage, fetchNextPage, isFetching, refetch: refetchSingleTweet } = api.tweet.timeline.useInfiniteQuery({
   //   limit: LIMITTWEETS,
   //   // where
@@ -157,9 +83,9 @@ const SingleTweet = ({ tweetId }:{tweetId: string}) => {
     return;
   if (tweet?._count.comment > 0)
     hasComment = true;
-  console.log(hasComment)
+  // console.log(hasComment)
   // const link = tweet.author.username || tweet.author.name
-  console.log(tweet);
+  // console.log(tweet);
   // refetchSingleTweet();
   // useEffect(() => {
   //   if (scrollPosition > 90 && hasNextPage && !isFetching) {
@@ -168,6 +94,7 @@ const SingleTweet = ({ tweetId }:{tweetId: string}) => {
   //   }
   // }, [scrollPosition, hasNextPage, isFetching, fetchNextPage]);
   // const client = useQueryClient();
+  // const where ={{}};
   return (
     <div className='min-h-[1226px]  relative'>
       {/* content of the tweet */}
@@ -187,23 +114,23 @@ const SingleTweet = ({ tweetId }:{tweetId: string}) => {
                     </div>
                     <div className='absolute w-full h-full inset-0'>
                       <div className='rounded-full'>
-                        <Image src="https://pbs.twimg.com/profile_images/1617675151373635584/r30JDsSm_normal.jpg" alt="avatar" width={48} height={48}  className="rounded-full"/>
+                        <Image src={tweet.author.image} alt="avatar" width={48} height={48}  className="rounded-full"/>
                       </div>
                     </div>
                   </div>
                 </div>
-                {/* name and username */}
+                {/* name and username and features */}
                 <div className='flex items-center justify-between tracking-wider w-full'>
-                  <div className='flex flex-col justify-start items-center flex-shrink text-[15px]'>
+                  <div className='flex flex-col justify-center items-start flex-shrink text-[15px]'>
                     <div>
                       <Link href={"/"} className=' font-semibold hover:underline'>
                         <span className='break-words min-w-0 leading-5'>
-                          huu thong le
+                          {tweet.author.name}
                         </span>
                       </Link>
                     </div>
                     <div className='text-lighttext cursor-pointer '>
-                      <Link href={"/"} className="font-normal ">@huuthongle</Link>
+                      <Link href={"/"} className="font-normal ">@{tweet.author.username}</Link>
                     </div>
                   </div>
                   {/* features */}
@@ -213,8 +140,12 @@ const SingleTweet = ({ tweetId }:{tweetId: string}) => {
                         <HiEllipsisHorizontal className='text-[20px]'/>
                       </div>
                     </div>
+
+                    {/* delete */}
+                    <button onClick={handleDeleteTweet}>delete</button>
                   </div>
                 </div>
+                
               </div>
               {/* content time, vew, reweet, likes, interactivity */}
               <div className='flex flex-col'>
@@ -231,13 +162,29 @@ const SingleTweet = ({ tweetId }:{tweetId: string}) => {
                     }
                   </div>
                   {/* Images */}
-                  {images && 
+                  {images &&
                     <div className='mt-3'>
                       <div className='flex gap-1 w-full'>
                         <div className='flex justify-start w-full'>
                           <div className='rounded-[16px]  w-full'>
                             <div className='flex h-full w-full grow'>
-                              
+                              {images && images.map(image => (
+                                <Link href={"/"} key={image.id} className=' h-full cursor-pointer outline-none w-full'>
+                                  <div className='overflow-hidden h-auto relative rounded-[16px] border-bordercl '>
+                                    <div className=' pb-[133.333%] w-full '>
+                                    </div>
+                                    <div className='absolute w-full h-full inset-0 block border border-bordercl  '>
+                                      
+                                      <Image src={image.url} alt="alt"
+                                        className='w-full h-full' 
+                                        width={500} height={500}
+                                        />
+
+                                    </div>
+                                    
+                                  </div>
+                                </Link>
+                              ))}
                             </div>
                           </div>
                         </div>
@@ -283,7 +230,7 @@ const SingleTweet = ({ tweetId }:{tweetId: string}) => {
                                 {tweet?._count.comment}
                               </div>
                               <span className='text-iconFIll'>
-                                Retweets
+                                Comments
                               </span>
                             </Link>
                           </div>
@@ -344,15 +291,29 @@ const SingleTweet = ({ tweetId }:{tweetId: string}) => {
             </div>
           </article>
           <div>
-            tweet your reply
+            {/* add comments */}
+            <section className='px-3 py-1 border-t border-solid border-separate border-neutral-300 text-[14px] shrink-0 text-secondary_text relative '>
+              <div>
+                <form action="" className=' flex boder-0 border-none m-0 p-0 relative align-baseline' >
+                  <textarea className=' h-[18px]  grow-border-none outline-none resize-none active:border-none active:outline-none text-start whitespace-pre-wrap w-full rounded-none text-slate-700 appearance-none' placeholder='Add a comment...' onChange={(e) => setText(e.target.value)} value={text} onKeyUp={handleSubmitComment}>
+                  </textarea>
+                </form>
+              </div>
+            </section>
           </div>
         </div>
 
       </div>
       {/* comment */}
       <div>
-
+        
       </div>
+      
+      {/* <Tweet key={tweet.id} tweet={tweet} input={{ where, limit: LIMITTWEETS }} client={client} utils={utils}
+      ></Tweet> */}
+      <Comment tweetId ={tweetId} author = {tweet.author} />
+
+
     </div>
   )
 }

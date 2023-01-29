@@ -8,7 +8,7 @@ import {
 
 import { useScrollPosition } from '../../hooks/useScrollPosition';
 
-const LIMITTWEETS = 3;
+const LIMITTWEETS = 10;
 
 
 const TweetLine = ({where = {}}:{where: RouterInputs['tweet']['timeline']['where']}) => {

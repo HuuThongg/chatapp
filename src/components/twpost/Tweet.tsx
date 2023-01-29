@@ -130,7 +130,7 @@ client: QueryClient;
     router.push(`/status/${tweetId}`)
   }
   return( 
-    <div className='css-intial border-t-1 border-bordercl pt-1 max-w-[598px] w-full z-0'>
+    <div className='css-intial border-t border-bordercl pt-1 max-w-[598px] w-full z-0'>
       <article className='px-4  hover:bg-tweetHoverCl cursor-pointer'
         onClick={handleTweetClick}
       >
@@ -146,7 +146,7 @@ client: QueryClient;
             >
               <Link href={`/${link!}`} className=" w-[48px] h-[48px]">
                 {tweet.author.image &&
-                  <Image src={tweet.author.image} alt={`${tweet.author.name} profile picture`} className='rounded-full'
+                  <Image src={tweet.author.image} alt={`${tweet.author.name!} profile picture`} className='rounded-full'
                     width={48}
                     height={48} />
                 }
@@ -158,7 +158,7 @@ client: QueryClient;
               <div className='flex justify-between items-center pointer-events-auto text-[15px] w-full '>
                 <div className='flex flex-shrink max-w-full text-[15px] ' onClick={(e) => e.stopPropagation() }>
                   {/* name */}
-                  <Link href={`/${tweet.author.username}`} className=' font-semibold hover:underline '>
+                  <Link href={`/${tweet.author.username!}`} className=' font-semibold hover:underline '>
                     {tweet.author.name}
                   </Link>
                   {/* handle and time */}
@@ -200,35 +200,38 @@ client: QueryClient;
                   }
                 </div>
                 {/* Images */}
-                <div className='mt-3'>
-                  <div className='flex gap-1 w-full'>
-                    <div className='flex justify-start w-full'>
-                      <div className='rounded-[16px]  w-full'>
-                        <div className='flex h-full w-full grow'>
-                          {images && images.map(image => (
-                            <Link href={"/"} key={image.id} className=' h-full cursor-pointer outline-none w-full'>
-                              <div className='overflow-hidden h-[510px] w-[382.5px] relative rounded-[16px] border-bordercl '>
-                                <div className=' pb-[133.333%] w-full '>
+                
+                {images && 
+                  <div className='mt-3'>
+                    <div className='flex gap-1 w-full'>
+                      <div className='flex justify-start w-full'>
+                        <div className='rounded-[16px]  w-full'>
+                          <div className='flex h-full w-full grow'>
+                            {images && images.map(image => (
+                              <Link href={"/"} key={image.id} className=' h-full cursor-pointer outline-none w-full'>
+                                <div className='overflow-hidden h-[510px] w-[382.5px] relative rounded-[16px] border-bordercl '>
+                                  <div className=' pb-[133.333%] w-full '>
+                                  </div>
+                                  <div className='absolute w-full h-full inset-0 block border border-bordercl  '>
+                                    {/* <img src="https://pbs.twimg.com/media/Fm4RcbLaEAARBZQ?format=jpg&name=small" alt="" /> */}
+                                    <img src={image.url} alt="alt" 
+                                    className='w-full h-full' />
+                                    
+                                  </div>
+                                  <p>dsads</p>
                                 </div>
-                                <div className='absolute w-full h-full inset-0 block border border-bordercl  '>
-                                  {/* <img src="https://pbs.twimg.com/media/Fm4RcbLaEAARBZQ?format=jpg&name=small" alt="" /> */}
-                                  <img src={image.url} alt="alt" 
-                                  className='w-full h-full' />
-                                  
-                                </div>
-                                <p>dsads</p>
-                              </div>
-                            </Link>
-                          ))}
+                              </Link>
+                            ))}
+                          </div>
                         </div>
                       </div>
+                      
                     </div>
-                    
                   </div>
-                </div>
+                }
                 {/* Interaction */}
                 <div>
-                  <Interaction likeFn={likeMutation} unlikeFn={unlikeMutation} tweetId={tweetId} hasLike={hasLike} twCreateAt={tweet.createdAt} likeCount={tweet._count.like} commentCount={tweet._count.comment} commentData={tweet.comment} />
+                  <Interaction likeFn={likeMutation} unlikeFn={unlikeMutation} tweetId={tweetId} hasLike={hasLike}  likeCount={tweet._count.like} commentCount={tweet._count.comment} commentData={tweet.comment} />
                 </div>
               </div>
             </div>

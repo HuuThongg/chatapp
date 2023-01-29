@@ -20,6 +20,7 @@ const config = {
       "lh3.googleusercontent.com",
       "pbs.twimg.com",
       "upload.wikimedia.org",
+      "twpostassets.s3.us-west-1.amazonaws.com",
     ],
   },
 };
