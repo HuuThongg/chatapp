@@ -41,6 +41,7 @@ module.exports = {
         interHoverIconActive: "var(--interHoverIconActive)",
         iconFIll: "var(--iconFIll)",
         iconFIllActive: "var(--iconFIllActive)",
+        tweetButonHover: "var(--tweetButonHover)",
       },
       fontFamily: {
         sans: ["var(--font-inter)", ...defaultTheme.fontFamily.sans],

@@ -1,14 +1,20 @@
 import type { QueryClient , InfiniteData} from '@tanstack/react-query';
 import Link from 'next/link';
 
-import React from 'react'
+import React,{useState, useEffect, useCallback} from 'react'
 import type { RouterOutputs, RouterInputs } from '../../utils/api';
 import {api as trpc } from '../../utils/api';
 import Interaction from './Interaction';
-import Image from 'next/image'
+import NextImage from "next/image";
+// import Image from 'next/image'
 import dayjs from 'dayjs'
 import { useSession } from "next-auth/react"
 import { useRouter } from 'next/router'
+const b = 2;
+const styles = {
+  wrapper:
+    `pb-[calc(( ${b}*100)px)]`,
+};
 
 function updateCache({
   client,
@@ -88,10 +94,51 @@ client: QueryClient;
   const utils = trpc.useContext();
 
   const { data: sessionData } = useSession();
+  // dimensions of first image
+  const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
 
   const tweetId : string = tweet.id;
   // const { data: images } = trpc.tweet.getImagesForUser.useQuery({ tweetId });
-  const { data: images, isFetched } = trpc.tweet.getImagesForUser.useQuery({ tweetId });
+  const { data: images, isSuccess } = trpc.tweet.getImagesForUser.useQuery({ tweetId });
+  // if (images && isSuccess && images?.length >= 1){
+  //   const img = new Image();
+  //     img.onload = () => {
+  //       const width = img.width;
+  //       const height = img.height;
+  //       setImageDimensions({ width, height });
+  //     }
+  //     img.src = images[0].url;
+  //     console.log(imageDimensions);
+  // }
+  // const getFirstImageSize = useCallback(()=>{
+  //   if (images?.length > 0) {
+  //     const img = new Image();
+  //     img.onload = () => {
+  //       const width = img.width;
+  //       const height = img.height;
+  //       setImageDimensions({ width, height });
+  //     }
+  //     img.src = images[0].url;
+  //     console.log(imageDimensions);
+  //   }
+  // }, [ imageDimensions])()
+  function getFirstImageSize (){
+    if (images?.length > 0) {
+
+      const img = new Image();
+      img.onload = () => {
+        const width = img.width;
+        const height = img.height;
+        setImageDimensions({ width, height });
+      }
+      img.src = images[0].url;
+    }
+  }
+  useEffect(() => {
+    getFirstImageSize();
+  }, [images]); // Only re-run the effect if imageUrl changes
+  
+  
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   const likeMutation :(variables: { tweetId: string }) => void = trpc.tweet.like.useMutation({
@@ -125,13 +172,15 @@ client: QueryClient;
 
   const link = tweet.author.username || tweet.author.name
   const router = useRouter();
-  function handleTweetClick(e ){
+  function handleTweetClick(e: { preventDefault: () => void; } ){
     e.preventDefault();
-    router.push(`/status/${tweetId}`)
+    void router.push(`/status/${tweetId}`)
   }
+  const firstImageRatio = imageDimensions.width / imageDimensions.height
+  
   return( 
-    <div className='css-intial border-t border-bordercl pt-1 max-w-[598px] w-full z-0'>
-      <article className='px-4  hover:bg-tweetHoverCl cursor-pointer'
+    <div className=' border-t border-bordercl pt-1 max-w-[598px] w-full z-0  relative'>
+      <article className='px-4  hover:bg-tweetHoverCl cursor-pointer '
         onClick={handleTweetClick}
       >
         <div className='flex flex-col pointer-events-auto relative shrink-0 basis-auto'>
@@ -146,7 +195,7 @@ client: QueryClient;
             >
               <Link href={`/${link!}`} className=" w-[48px] h-[48px]">
                 {tweet.author.image &&
-                  <Image src={tweet.author.image} alt={`${tweet.author.name!} profile picture`} className='rounded-full'
+                  <NextImage src={tweet.author.image} alt={`${tweet.author.name!} profile picture`} className='rounded-full'
                     width={48}
                     height={48} />
                 }
@@ -188,7 +237,7 @@ client: QueryClient;
               </div>
               
               {/*text, images, interactivity */}
-              <div className=''>
+              <div className='flex flex-col'>
                 {/* text */}
                 <div className=''>
                   {
@@ -202,26 +251,95 @@ client: QueryClient;
                 {/* Images */}
                 
                 {images && 
-                  <div className='mt-3'>
+                  <div className='mt-3 gap-3 '>
                     <div className='flex gap-1 w-full'>
-                      <div className='flex justify-start w-full'>
-                        <div className='rounded-[16px]  w-full'>
-                          <div className='flex h-full w-full grow'>
-                            {images && images.map(image => (
+                      <div className='w-full flex justify-start'>
+                        <div className='rounded-[16px] w-full h-full '>
+                          <div className='flex h-full grow'>
+                            {/* {images && images.map(image => (
                               <Link href={"/"} key={image.id} className=' h-full cursor-pointer outline-none w-full'>
                                 <div className='overflow-hidden h-[510px] w-[382.5px] relative rounded-[16px] border-bordercl '>
                                   <div className=' pb-[133.333%] w-full '>
                                   </div>
                                   <div className='absolute w-full h-full inset-0 block border border-bordercl  '>
-                                    {/* <img src="https://pbs.twimg.com/media/Fm4RcbLaEAARBZQ?format=jpg&name=small" alt="" /> */}
-                                    <img src={image.url} alt="alt" 
-                                    className='w-full h-full' />
                                     
+                                    <img src={image.url} alt="alt"
+                                      className=' h-full' />
+
                                   </div>
                                   <p>dsads</p>
                                 </div>
                               </Link>
-                            ))}
+                            ))} */}
+                            {images.length > 0 &&
+
+                              <div className='my-1 w-full relative ' >
+
+                                <div className='flex w-full overflow-hidden relative'>
+                                  {/* padding */}
+                                  <div className={`w-full ${firstImageRatio > 1.33 ? 'pb-[75%]' : firstImageRatio > 1.00 ? 'pb-[calc(100)px)]' : 'pb-[56.25%]'} ${images.length > 1 ? "pb-[56.25%]" : ""}    `}>
+                                  </div>
+                                  <div className='absolute w-full h-full  top-0 left-0 bottom-0'>
+                                    <div className='flex w-full h-full'>
+                                      {/* images on the left */}
+                                      <div className='mr-3 flex flex-col grow basis-0 space-y-2'>
+                                        {/* uppper image */}
+                                        <div className='grow cursor-pointer basis-0 w-full  rounded-[16px] relative overflow-hidden '>
+                                          <div className='absolute inset-0'>
+                                            <img src={images[0].url} alt="" className='w-full h-full  object-scale-down ' />
+                                          </div>
+                                        </div>
+                                        {/* below image */}
+                                        {(images[1] && images[2]) &&
+                                          <div className='grow cursor-pointer  basis-0 rounded-[16px] relative overflow-hidden'>
+                                            <div className='absolute inset-0'>
+                                              <img src={images[1].url} alt="" className='w-full h-full' />
+                                            </div>
+                                          </div>
+                                        }
+                                      </div>
+
+                                      {/* images on the right */}
+                                      {images[2] &&
+                                        <div className=' flex flex-col grow basis-0 space-y-2'>
+                                          {/* uppper image */}
+                                          {images[2] &&
+                                            <div className='grow cursor-pointer basis-0 w-full  rounded-[16px] relative overflow-hidden'>
+                                              <div className='absolute inset-0'>
+                                                <img src={images[2].url} alt="" className='w-full h-full  object-scale-down ' />
+                                              </div>
+                                            </div>
+                                          }
+                                          {/* down image */}
+                                          {images[3] &&
+                                            <div className='grow cursor-pointer  basis-0 rounded-[16px] relative overflow-hidden'>
+                                              <div className='absolute inset-0'>
+                                                <img src={images[3].url} alt="" className='w-full h-full' />
+                                              </div>
+                                            </div>
+                                          }
+                                        </div>
+                                      }
+
+                                      {/* images on the right */}
+                                      {(images[1] && !images[2]) &&
+                                        <div className=' flex flex-col grow basis-0 space-y-2'>
+
+                                          <div className='grow cursor-pointer basis-0 w-full  rounded-[16px] relative overflow-hidden'>
+                                            <div className='absolute inset-0'>
+                                              <img src={images[1].url} alt="" className='w-full h-full  object-scale-down ' />
+                                            </div>
+                                          </div>
+                                        </div>
+                                      }
+                                    </div>
+                                  </div>
+                                </div>
+
+                              </div>
+                            }
+                            
+                            
                           </div>
                         </div>
                       </div>

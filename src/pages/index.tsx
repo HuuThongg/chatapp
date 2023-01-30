@@ -1,39 +1,10 @@
 import { type NextPage } from "next";
 import Head from "next/head";
-import { useSession } from "next-auth/react";
-import { useEffect } from "react"
-import  useOnChange  from "../hooks/useOnChange"
-import { api } from "../utils/api";
-
 import { SideBar } from "../components/sidebar";
 import { MainPageTw } from '../components/main'
-
+import { createPortal } from 'react-dom';
 const  Home: NextPage = () => {
-  const {
-    values: { name, username, image },
-    setValues,
-    handleChange,
-  } = useOnChange({ name: "", username: "", image: "" });
-
-  const changeUserDataMutation = api.user.changeUserData.useMutation();
-  const { data: sessionData } = useSession();
-  const changeUserData = (event: React.SyntheticEvent) => {
-    event.preventDefault();
-    changeUserDataMutation.mutate({
-      name: name || undefined, 
-      username: username || undefined,
-      image: image || undefined,
-    });
-  };
-  useEffect(() => {
-    if (sessionData?.user) {
-      setValues({
-        name: sessionData.user.name || "",
-        username: sessionData.user.username || "",
-        image: sessionData.user.image || "",
-      });
-    }
-  }, [sessionData]);
+  
   return (
     <>
       <Head>
@@ -47,6 +18,7 @@ const  Home: NextPage = () => {
           <div className="h-full flex shrink-0 items-stretch grow-0 relative ">
             <SideBar />
             <MainPageTw />
+            
           </div>
         </div>
       </div>

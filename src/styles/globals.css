@@ -34,9 +34,11 @@
   --textWarn: rgba(244,33,46);
   /* b */
   --interHoverIcon: rgba(29,155,240,0.1);
-  --interHoverIconActive: rgba(249,24,128,0.1); 
+  /* --interHoverIconActive: rgba(249,24,128,0.1);  */
+  --interHoverIconActive: rgba(29,155,240,0.2); 
   --iconFIllActive: rgb(29,155,240);
   --iconFIll:rgba(83,100,113);
+  --tweetButonHover: rgb(26,140,216);
 }
 
 [data-theme="dark"] {
@@ -66,6 +68,8 @@
   --iconColor: rgb(83, 100, 113);
   --interHoverIcon: rgba(29,155,240,0.1);
   --interHoverIconActive: rgba(249,24,128,0.1); 
+  --tweetButonHover: rgb(26,140,216);
+
 }
 
 body {

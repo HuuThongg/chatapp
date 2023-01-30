@@ -24,7 +24,6 @@ const s3 = new S3({
 export const tweetRouter = createTRPCRouter({
   create: protectedProcedure.input(tweetSchema).mutation(({ ctx, input }) => {
     const { prisma, session } = ctx;
-    if (!input?.text) return;
 
     const { text } = input;
     const userId = session.user.id;

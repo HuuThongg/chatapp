@@ -17,7 +17,7 @@ const MyApp: AppType<{ session: Session | null }> = ({
   pageProps: { session, ...pageProps },
 }) => {
   return (
-    <ThemeProvider defaultTheme="light">
+    <ThemeProvider defaultTheme="light" >
       <SessionProvider session={session}>
         {/* <div className={`${mainFont.variable} font-sans`}> */}
           <Component {...pageProps} />
