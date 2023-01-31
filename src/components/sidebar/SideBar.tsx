@@ -175,7 +175,7 @@ const SideBar = () => {
                   <div className=''>
                     <Image 
                     className=' h-[40px] w-[40px] rounded-full object-cover'
-                      src={profileSrc} alt="avatar"
+                      src={profileSrc!} alt="avatar"
                       width={40}
                       height={40}
                     />

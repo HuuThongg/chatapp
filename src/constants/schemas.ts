@@ -18,3 +18,17 @@ export type Message = z.TypeOf<typeof messageSchema>;
 export const messageSubSchema = z.object({
   roomId: z.string(),
 });
+
+export const tweetSchema = z.optional(
+  z.object({
+    text: z.optional(
+      z.string({
+        required_error: "Text is required",
+      })
+    ),
+  })
+);
+export type ImageDimensions = {
+  width: number;
+  height: number;
+};

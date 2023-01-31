@@ -2,7 +2,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import NextImage from "next/image";
 
-import { object, string } from 'zod'
 import { api as trpc } from '../../utils/api'
 import { GrImage } from 'react-icons/gr'
 import { BsEmojiSmile } from 'react-icons/bs'
@@ -10,33 +9,26 @@ import * as z from 'zod'
 import { TweetLine } from '../twpost';
 import AuthShowcase from '../AuthShowcase/AuthShowcase';
 import Picker from '@emoji-mart/react'
-import data from '@emoji-mart/data'
-export const tweetSchema = z.optional(object({
-  text: z.optional(string(
-    {
-      required_error: 'Text is required'
-    }
-  )),
-}))
-// export const tweetSchema = z.object({
-//                 text: z.string().optional(),
-//               })
-//               .optional()
+import data, { EmojiMartData } from '@emoji-mart/data'
+
+import { tweetSchema } from '../../constants/schemas';
+import type { ImageDimensions } from '../../constants/schemas';
 
 const MainPageTw = () => {
+
   const utils = trpc.useContext();
 
   const fileInput = useRef<HTMLInputElement>(null);
-  const [imageDimensions, setImageDimensions]= useState({width:0, height:0});
-  const toggleEmojiRef = useRef(null);
+  const [imageDimensions, setImageDimensions] = useState<ImageDimensions>({ width: 0, height: 0 });
+  const toggleEmojiRef = useRef<HTMLDivElement>(null);
   const [isOpenEmoji, setOpenEmoji] = useState<boolean>(false)
-  const controlHeight = useRef(null)
-  const [text, setText] = useState("")
+  const controlHeight = useRef<HTMLDivElement>(null)
+  const [text, setText] = useState<string>("")
   const [error, setError] = useState<string | null | boolean>(false);
-  const [file, setFile] = useState<any>(null);
-  const [images, setImages] = useState([]);
+  const [file, setFile] = useState<File[]>([]);
+  const [images, setImages] = useState<string[]>([]);
   const { mutateAsync } = trpc.tweet.create.useMutation({
-    onSuccess:  () => {
+    onSuccess: () => {
       setText("")
       // void utils.tweet.timeline.invalidate();
     },
@@ -47,27 +39,26 @@ const MainPageTw = () => {
 
   const { mutateAsync: createPresignedUrl } = trpc.tweet.createPresignedUrl.useMutation();
 
-  // const { data: tweetData } = trpc.tweet.timeline.useQuery({
-  //   limit: 9,
-  // })
-  
-  // const twId: string = tweetData?.tweets[0]?.id;
-
-  // const { data: images, refetch: refetchImages } = trpc.tweet.getImagesForUser.useQuery({ tweetId: twId });
 
   const { mutateAsync: deleteAllImages } = trpc.tweet.deleteImage.useMutation();
 
   const onFileChange = (e: React.FormEvent<HTMLInputElement>) => {
     const files = e.currentTarget.files;
     if (!files) return;
-    const fileList = [];
+    const fileList: File[] = [];
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
-      fileList.push(file);
+      fileList.push(file!);
       const reader = new FileReader();
       reader.onload = () => {
-        setImages(prevImages => [...prevImages, reader.result]);
-        if(i==0){
+        setImages(prevImages => {
+          if (typeof reader.result === 'string') {
+            return [...prevImages, reader.result];
+          }
+          return prevImages;
+        });
+
+        if (i == 0) {
 
           const img = new Image();
           img.onload = () => {
@@ -75,38 +66,44 @@ const MainPageTw = () => {
             const height = img.height;
             setImageDimensions({ width, height });
           }
-          img.src = reader.result;
+          if (typeof reader.result === 'string') {
+            img.src = reader.result;
+          }
         }
       }
-      reader.readAsDataURL(file);
+      if (file) {
+        reader.readAsDataURL(file);
+      }
     }
     setFile(fileList);
   }
-  
+
   const selectImage = () => {
-    if(fileInput.current){
-        fileInput.current.click();
+    if (fileInput.current) {
+      fileInput.current.click();
     }
   };
-  
-  async function handleSubmit(e: React.FormEvent<HTMLTextAreaElement>) {
+
+  async function handleSubmit(e: React.FormEvent<HTMLInputElement>) {
     e.preventDefault();
     try {
       tweetSchema.parse({ text })
-    } catch (er: any) {
-      setError(er.message);
-      return;
+    } catch (er) {
+      if (er instanceof Error)
+        return setError(er.message);
     }
     const result = await mutateAsync({ text });
-    if(!file){
+    if (!file) {
       void utils.tweet.timeline.invalidate();
       return;
     }
     const tweetId = result?.tweetId;
-    const data = await createPresignedUrl({ tweetId: tweetId, n: file.length }) as any;
+    const data: unknown[] = await createPresignedUrl({ tweetId: tweetId, n: file.length });
+
     await uploadImage(data, e);
   }
-  function postData(url: RequestInfo | URL, fields: any, file: { type: any; }) {
+  
+  function postData(url:string, fields: unknown, file: File[]) {
     const data = { ...fields, 'Content-type': file.type, file }
     const formData = new FormData();
     for (const name in data) {
@@ -115,46 +112,46 @@ const MainPageTw = () => {
     return fetch(url, {
       method: 'POST',
       body: formData,
-      
+
     });
   }
-  async function uploadImage(data: any[], e: React.FormEvent<HTMLInputElement>) {
+  async function uploadImage(data: unknown[], e: React.FormEvent<HTMLInputElement>) {
     e.preventDefault();
     if (!file) return;
     // const amountFiles : number = file.length;
 
     // const { url, fields }: { url: string, fields: any } = await createPresignedUrl({tweet.tweetId ,n: amountFiles}) as any;
-    const postDataPromise = data.map((imgI4: { url: any; fields: any; }, index: string | number) => postData(imgI4.url, imgI4.fields, file[index])
+    console.log(data);
+    const postDataPromise = data.map((imgI4: { url: string; fields: any; }, index: string | number) => postData(imgI4.url, imgI4.fields, file[index])
     )
-    void Promise.all(postDataPromise)
-      .then(() => {
-        void utils.tweet.timeline.invalidate();
+    await Promise.all(postDataPromise)
 
-      })
+    void utils.tweet.timeline.invalidate();
+
     if (file) {
       file.forEach(file => URL.revokeObjectURL(file));
       setImages([]);
     }
   }
 
-  const handleDelete = async (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     // deleteAllImages({tweetId: twId});
   }
-  
-  function checkHeight () {
-    if (controlHeight.current.offsetHeight > 780) {
+
+  function checkHeight() {
+    if (controlHeight?.current && controlHeight.current.offsetHeight > 780) {
       controlHeight.current.style.overflowY = 'auto'
     }
   }
 
-  function addEmoji(e) {
+  function addEmoji(e: { native: string; }) {
     console.log(text);
-    let emoji = e.native;
-    
-    setText(text + emoji )
+    const emoji : string = e.native;
+
+    setText(text + emoji)
   }
-  function handleInputTweetChange(e){
+  function handleInputTweetChange(e: { target: { value: React.SetStateAction<string>; }; }) {
     setText(e.target.value)
   }
 
@@ -163,9 +160,9 @@ const MainPageTw = () => {
   }, [])
 
   useEffect(() => {
-    const checkIfLickedOutside = (e) => {
+    const checkIfLickedOutside = (e: MouseEvent) => {
       // // If the emjoi selection is open and the clicked target is not within the emjoi selection, then close selection
-      if (isOpenEmoji && toggleEmojiRef.current && !toggleEmojiRef.current.contains(e.target))
+      if (isOpenEmoji && toggleEmojiRef.current && !toggleEmojiRef.current.contains(e.target as Node))
         setOpenEmoji(false);
     };
     document.addEventListener("mousedown", checkIfLickedOutside);
@@ -175,22 +172,21 @@ const MainPageTw = () => {
       document.removeEventListener("mousedown", checkIfLickedOutside);
     };
   }, [isOpenEmoji]);
-  const firstImageRatio = imageDimensions.height/imageDimensions.width
+  const firstImageRatio = imageDimensions.height / imageDimensions.width
   let tweetButtonDisabled = true;
-  if(text !=="" || images.length > 0 ){
+  if (text !== "" || images.length > 0) {
     tweetButtonDisabled = false;
   }
-  console.log(tweetButtonDisabled)
   return (
     <main className='flex flex-col p-0 m-0 border-none grow items-start  shrink basis-auto  text-[15px] relative  bg-bgcl pointer-events-auto text-black'>
       <div className='w-[990px] flex flex-col shrink grow  basis-auto m-0 p-0 min-h-0 min-w-0 relative z-0'>
         {/* content */}
         <div className='max-w-[600px] w-full z-[1] border-x border-bordercl bg-bgcl  min-h-screen h-full pointer-events-auto'>
           {/* login logout */}
-          <AuthShowcase/>
+          <AuthShowcase />
           {/* Home */}
-          <div 
-          className='sticky  top-0 z-[3] pointer-events-auto text-[15px] bg-homeCl border-b  '>
+          <div
+            className='sticky  top-0 z-[3] pointer-events-auto text-[15px] bg-homeCl border-b  '>
             <div className='h-[53px] max-w-[1000px] cursor-pointer flex p-4 w-full items-center justify-start mx-auto  '>
               <h1 className='text-[20px] leading-6'>
                 <div className='block font-semibold blur-none  text-black'>Home</div>
@@ -198,7 +194,7 @@ const MainPageTw = () => {
             </div>
           </div>
           {/* create tweet //  new tweet */}
-          <div className='css-intial  pointer-events-auto  '>
+          <div className=' pointer-events-auto  '>
             <div className=' px-4'>
               <div className=' relative flex py-1  '>
                 {/* avatar */}
@@ -225,23 +221,23 @@ const MainPageTw = () => {
                       <div className='overflow-y-auto max-h-[768px] min-h-[26px] w-full' ref={controlHeight}>
                         <div className='  h-full relative '>
 
-                          <form id="createPost" onSubmit={handleSubmit} className=" relative flex  flex-col  border-none rounded-md 
+                          <form id="createPost" onSubmit={() => handleSubmit} className=" relative flex  flex-col  border-none rounded-md 
                           cursor-text text-left text-xl  w-full ">
 
 
-                            <textarea  onChange={handleInputTweetChange} 
+                            <textarea onChange={handleInputTweetChange}
                               className='block border-none active:border-none whitespace-pre-wrap break-words  pointer-events-auto w-full max-h-[768px] h-full scrollbar-hide' rows={2}
                               placeholder="what&apos;s happenings?" value={text}
                             />
-                            
+
                             {/* <span className=' -mt-9 whitespace-pre-wrap break-words  h-full pointer-events-none text-teal-300 overflow-hidden text-ellipsis'>{text}
                             </span> */}
-                            
+
                           </form>
                         </div>
                       </div>
 
-                      
+
 
                       {error && JSON.stringify(error)}
 
@@ -251,7 +247,7 @@ const MainPageTw = () => {
 
                   {/* images picked from pc */}
                   {images.length > 0 &&
-                    <div  className='my-1 w-full relative ' >
+                    <div className='my-1 w-full relative ' >
                       <div className='flex w-full overflow-hidden relative'>
                         {/* padding */}
                         <div className={`w-full  ${firstImageRatio > 1.33 ? 'pb-[133.333%]' : firstImageRatio > 1.00 ? 'pb-[calc(100)px)]' : 'pb-[56.25%]'} ${images.length > 1 ? "pb-[56.25%]" : ""}`}>
@@ -267,7 +263,7 @@ const MainPageTw = () => {
                                 </div>
                               </div>
                               {/* below image */}
-                              {(images[1] && images[2])  && 
+                              {(images[1] && images[2]) &&
                                 <div className='grow cursor-pointer  basis-0 rounded-[16px] relative overflow-hidden'>
                                   <div className='absolute inset-0'>
                                     <img src={images[1]} alt="" className='w-full h-full' />
@@ -275,12 +271,12 @@ const MainPageTw = () => {
                                 </div>
                               }
                             </div>
-                            
+
                             {/* images on the right */}
-                            {images[2] &&   
+                            {images[2] &&
                               <div className=' flex flex-col grow basis-0 space-y-2'>
                                 {/* uppper image */}
-                                {images[2] && 
+                                {images[2] &&
                                   <div className='grow cursor-pointer basis-0 w-full  rounded-[16px] relative overflow-hidden'>
                                     <div className='absolute inset-0'>
                                       <img src={images[2]} alt="" className='w-full h-full  object-scale-down ' />
@@ -288,7 +284,7 @@ const MainPageTw = () => {
                                   </div>
                                 }
                                 {/* down image */}
-                                {images[3] && 
+                                {images[3] &&
                                   <div className='grow cursor-pointer  basis-0 rounded-[16px] relative overflow-hidden'>
                                     <div className='absolute inset-0'>
                                       <img src={images[3]} alt="" className='w-full h-full' />
@@ -299,20 +295,20 @@ const MainPageTw = () => {
                             }
 
                             {/* images on the right */}
-                            { (images[1] && !images[2]) &&
+                            {(images[1] && !images[2]) &&
                               <div className=' flex flex-col grow basis-0 space-y-2'>
-                                
-                                  <div className='grow cursor-pointer basis-0 w-full  rounded-[16px] relative overflow-hidden'>
-                                    <div className='absolute inset-0'>
-                                      <img src={images[1]} alt="" className='w-full h-full  object-scale-down ' />
-                                    </div>
+
+                                <div className='grow cursor-pointer basis-0 w-full  rounded-[16px] relative overflow-hidden'>
+                                  <div className='absolute inset-0'>
+                                    <img src={images[1]} alt="" className='w-full h-full  object-scale-down ' />
                                   </div>
+                                </div>
                               </div>
                             }
                           </div>
                         </div>
                       </div>
-                      
+
                     </div>
                   }
                   {/* things added to a post */}
@@ -340,28 +336,28 @@ const MainPageTw = () => {
                           />
                           {/* BsEmojiSmile */}
                         </div>
-                        
+
                         {/* pick emoji */}
                         <div className='flex items-center justify-center mt-3'
                           ref={toggleEmojiRef}
                         >
                           <div className='w-[36px] h-[36px]  rounded-[9999px] flex items-center justify-center cursor-pointer overflow-hidden hover:bg-interHoverIcon active:bg-interHoverIconActive  '
-                            onClick={()=>setOpenEmoji(true)
+                            onClick={() => setOpenEmoji(true)
                             }
                           >
                             <div className='flex items-center justify-center grow '>
                               <BsEmojiSmile />
                             </div>
                           </div>
-                          {isOpenEmoji && 
-                            <Picker data={data} onEmojiSelect={addEmoji} /> 
+                          {isOpenEmoji &&
+                            <Picker data={data} onEmojiSelect={addEmoji} />
                           }
                         </div>
                       </div>
 
                       <div className='mt-1'>
                         <button className={`bg-iconFIllActive px-5 py-2 mr-2 rounded-[20px] text-white font-medium hover:bg-tweetButonHover text-base ${tweetButtonDisabled ? "opacity-50" : "opacity-100"}`}
-                          onClick={handleSubmit} disabled={tweetButtonDisabled}
+                          onClick={()=>handleSubmit} disabled={tweetButtonDisabled}
                         >Tweet</button>
                         {/* <button
                           onClick={handleDelete}
@@ -374,7 +370,7 @@ const MainPageTw = () => {
             </div>
           </div>
           <section className=' border-t border-bordercl '>
-            <TweetLine where={{}}/>
+            <TweetLine where={{}} />
           </section>
         </div>
         {/* search */}

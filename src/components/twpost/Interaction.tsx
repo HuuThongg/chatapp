@@ -59,33 +59,26 @@ const Interaction = ({ tweetId, likeFn, unlikeFn, hasLike, likeCount  , commentC
     }
   });
 
-  const {mutateAsync: deleteCommentFn}=trpc.tweet.deleteComment.useMutation({
-    onSuccess:  () => {
-      void utils.tweet.timeline.invalidate();
-    }
-  })
-  // const commentIdd = comment.id;
-  const {data: comments} = trpc.comment.getComments.useQuery({tweetId});
-  // console.log(commentData);
-  // console.log(comments);
-  const {mutateAsync : likeCommentFn} =trpc.comment.likeComment.useMutation({
-    onSuccess:(data, error, variables, context)  =>{
-      console.log(data, error, variables, context);
-    },
-  });
-  const { mutateAsync: unlikeCommentFn } = trpc.comment.unlikeComment.useMutation({
-    onSuccess: (data, error, variables, context) => {
-      console.log(data, error, variables, context);
-    },
-  });
+  // const {mutateAsync: deleteCommentFn}=trpc.tweet.deleteComment.useMutation({
+  //   onSuccess:  () => {
+  //     void utils.tweet.timeline.invalidate();
+  //   }
+  // })
+  // // const commentIdd = comment.id;
+  // const {data: comments} = trpc.comment.getComments.useQuery({tweetId});
+
+  // const {mutateAsync : likeCommentFn} =trpc.comment.likeComment.useMutation({
+  //   onSuccess:(data, error, variables, context)  =>{
+  //     console.log(data, error, variables, context);
+  //   },
+  // });
+  // const { mutateAsync: unlikeCommentFn } = trpc.comment.unlikeComment.useMutation({
+  //   onSuccess: (data, error, variables, context) => {
+  //     console.log(data, error, variables, context);
+  //   },
+  // });
   const hasComment : boolean = commentData.length > 0;
   
-  const handleSubmitComment = (e:React.FormEvent<HTMLTextAreaElement>)=>{
-    if (e.key === "Enter") {
-      e.preventDefault();
-      createCommentFn({text,tweetId})
-    }
-  }
   return (
     <div className='shrink-0 grow-0 basis-auto  flex flex-col justify-start '>
       <div className=' rounded-lg pointer-events-auto relative '>
@@ -137,15 +130,6 @@ const Interaction = ({ tweetId, likeFn, unlikeFn, hasLike, likeCount  , commentC
               </div>
 
           </section>
-          {/* add comments */}
-          {/* <section className='px-3 py-1 border-t border-solid border-separate border-neutral-300 text-[14px] shrink-0 text-secondary_text relative '>
-            <div>
-              <form action="" className=' flex boder-0 border-none m-0 p-0 relative align-baseline' >
-                <textarea className=' h-[18px]  grow-border-none outline-none resize-none active:border-none active:outline-none text-start whitespace-pre-wrap w-full rounded-none text-slate-700 appearance-none' placeholder='Add a comment...' onChange={(e) => setText(e.target.value)} value={text} onKeyUp={handleSubmitComment}>
-                </textarea>
-              </form>
-            </div>
-          </section> */}
         </div>
       </div>
     </div>

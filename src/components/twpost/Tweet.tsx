@@ -1,7 +1,7 @@
 import type { QueryClient , InfiniteData} from '@tanstack/react-query';
 import Link from 'next/link';
 
-import React,{useState, useEffect, useCallback} from 'react'
+import React,{useState, useEffect, useCallback, useMemo} from 'react'
 import type { RouterOutputs, RouterInputs } from '../../utils/api';
 import {api as trpc } from '../../utils/api';
 import Interaction from './Interaction';
@@ -98,32 +98,26 @@ client: QueryClient;
   const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
 
   const tweetId : string = tweet.id;
-  // const { data: images } = trpc.tweet.getImagesForUser.useQuery({ tweetId });
-  const { data: images, isSuccess } = trpc.tweet.getImagesForUser.useQuery({ tweetId });
-  // if (images && isSuccess && images?.length >= 1){
-  //   const img = new Image();
-  //     img.onload = () => {
-  //       const width = img.width;
-  //       const height = img.height;
-  //       setImageDimensions({ width, height });
-  //     }
-  //     img.src = images[0].url;
-  //     console.log(imageDimensions);
-  // }
+
+  const { data: images, isSuccess } = useMemo(() => trpc.tweet.getImagesForUser.useQuery({ tweetId }),[tweetId]);
+  
   // const getFirstImageSize = useCallback(()=>{
-  //   if (images?.length > 0) {
+  //   if (images && images.length > 0) {
+
   //     const img = new Image();
   //     img.onload = () => {
   //       const width = img.width;
   //       const height = img.height;
   //       setImageDimensions({ width, height });
   //     }
-  //     img.src = images[0].url;
-  //     console.log(imageDimensions);
+  //     if(images[0]) {
+  //       img.src = images[0].url;
+  //     }
   //   }
-  // }, [ imageDimensions])()
-  function getFirstImageSize (){
-    if (images?.length > 0) {
+  // }, [images]
+  // ) 
+  const getFirstImageSize= ()=>{
+    if (images && images.length > 0) {
 
       const img = new Image();
       img.onload = () => {
@@ -131,17 +125,16 @@ client: QueryClient;
         const height = img.height;
         setImageDimensions({ width, height });
       }
-      img.src = images[0].url;
+      if (images[0]) {
+        img.src = images[0].url;
+      }
     }
   }
-  useEffect(() => {
-    getFirstImageSize();
-  }, [images]); // Only re-run the effect if imageUrl changes
-  
-  
+  getFirstImageSize();
+
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  const likeMutation :(variables: { tweetId: string }) => void = trpc.tweet.like.useMutation({
+  const likeMutation: (variables: { tweetId: string }) => void = trpc.tweet.like.useMutation({
     onSuccess:(data, variables)=>{
       updateCache({ client, variables, data, action:"like",input});
     },
@@ -233,7 +226,7 @@ client: QueryClient;
 
                 </div>
                 {/* delete */}
-                <button onClick={handleDeleteTweet} className='ml-auto'> delete</button>
+                <button onClick={()=>handleDeleteTweet} className='ml-auto'> delete</button>
               </div>
               
               {/*text, images, interactivity */}

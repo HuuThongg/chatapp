@@ -3,15 +3,7 @@ import { z } from "zod";
 import { env } from "../../../../src/env/server.mjs";
 import S3 from "aws-sdk/clients/s3";
 
-export const tweetSchema = z.optional(
-  z.object({
-    text: z.optional(
-      z.string({
-        required_error: "Text is required",
-      })
-    ),
-  })
-);
+import { tweetSchema } from "../../../constants/schemas";
 
 const s3 = new S3({
   apiVersion: "2006-03-01",
