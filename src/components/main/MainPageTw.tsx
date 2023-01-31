@@ -42,6 +42,58 @@ const MainPageTw = () => {
 
   const { mutateAsync: deleteAllImages } = trpc.tweet.deleteImage.useMutation();
 
+
+  // const onFileChange = (e: React.FormEvent<HTMLInputElement>) => {
+  //   const files = e.currentTarget.files;
+  //   if (!files) return;
+  //   const fileList: File[] = [];
+  //   for (let i = 0; i < files.length; i++) {
+  //     const file = files[i];
+  //     if(!file) return;
+  //     // fileList.push(file!);
+  //     const reader = new FileReader();
+  //     reader.onload = () => {
+  //       if (i == 0) {
+  //         const img = new Image();
+  //         img.onload = () => {
+  //           const width = img.width;
+  //           const height = img.height;
+  //           setImageDimensions({ width, height });
+  //         }
+  //         if (typeof reader.result === 'string') {
+  //           img.src = reader.result;
+  //         }
+  //       }
+  //       const canvas = document.createElement("canvas");
+  //       const context = canvas.getContext("2d");
+  //       const convertedImg = new Image();
+  //       let widthW, heightH
+  //       convertedImg.onload = () => {
+  //         const mWidth= 500;
+  //         canvas.width = convertedImg.width;
+  //         canvas.height = convertedImg.height;
+  //         const aspectRatio = convertedImg.width / convertedImg.height
+  //         // context?.drawImage(convertedImg, 0,0, canvas.width, canvas.height, 0, 0, 500, 500);
+  //         context?.drawImage(convertedImg, 0, 0, 500, 700);
+  //         setImages(prevImages => {
+  //           if (typeof reader.result === 'string') {
+  //             const resizedImage = canvas.toDataURL("image/jpeg");
+  //             fileList.push(resizedImage);
+  //             return [...prevImages, resizedImage];
+  //           }
+  //           return prevImages;
+  //         });
+  //       }
+  //       convertedImg.src = reader.result;
+  //     }
+  //     if (file) {
+  //       reader.readAsDataURL(file);
+  //     }
+  //   }
+  //   setFile(fileList);
+  // }
+
+
   const onFileChange = (e: React.FormEvent<HTMLInputElement>) => {
     const files = e.currentTarget.files;
     if (!files) return;
@@ -78,6 +130,7 @@ const MainPageTw = () => {
     setFile(fileList);
   }
 
+
   const selectImage = () => {
     if (fileInput.current) {
       fileInput.current.click();
@@ -85,6 +138,7 @@ const MainPageTw = () => {
   };
 
   async function handleSubmit(e: React.FormEvent<HTMLInputElement>) {
+    console.log("first")
     e.preventDefault();
     try {
       tweetSchema.parse({ text })
@@ -103,6 +157,37 @@ const MainPageTw = () => {
     await uploadImage(data, e);
   }
   
+
+  // function postData(url: string, fields: unknown, file: string) {
+  //   const formData = new FormData();
+  //   for (const name in fields) {
+  //     formData.append(name, fields[name]);
+  //   }
+  //   const blob = dataURItoBlob(file);
+  //   formData.append('file', blob, 'file.jpeg');
+  //   return fetch(url, {
+  //     method: 'POST',
+  //     body: formData,
+  //   });
+  // }
+
+  // function dataURItoBlob(dataURI: string) {
+  //   const byteString = atob(dataURI.split(',')[1]);
+  //   const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+  //   const ab = new ArrayBuffer(byteString.length);
+  //   const ia = new Uint8Array(ab);
+  //   for (let i = 0; i < byteString.length; i++) {
+  //     ia[i] = byteString.charCodeAt(i);
+  //   }
+  //   return new Blob([ab], { type: mimeString });
+  // }
+  
+
+
+
+
+
+
   function postData(url:string, fields: unknown, file: File[]) {
     const data = { ...fields, 'Content-type': file.type, file }
     const formData = new FormData();
@@ -121,7 +206,7 @@ const MainPageTw = () => {
     // const amountFiles : number = file.length;
 
     // const { url, fields }: { url: string, fields: any } = await createPresignedUrl({tweet.tweetId ,n: amountFiles}) as any;
-    console.log(data);
+    // console.log(data);
     const postDataPromise = data.map((imgI4: { url: string; fields: any; }, index: string | number) => postData(imgI4.url, imgI4.fields, file[index])
     )
     await Promise.all(postDataPromise)
@@ -221,7 +306,7 @@ const MainPageTw = () => {
                       <div className='overflow-y-auto max-h-[768px] min-h-[26px] w-full' ref={controlHeight}>
                         <div className='  h-full relative '>
 
-                          <form id="createPost" onSubmit={() => handleSubmit} className=" relative flex  flex-col  border-none rounded-md 
+                          <form id="createPost" onSubmit={handleSubmit} className=" relative flex  flex-col  border-none rounded-md 
                           cursor-text text-left text-xl  w-full ">
 
 
@@ -246,6 +331,7 @@ const MainPageTw = () => {
                   </div>
 
                   {/* images picked from pc */}
+                  
                   {images.length > 0 &&
                     <div className='my-1 w-full relative ' >
                       <div className='flex w-full overflow-hidden relative'>
@@ -259,7 +345,7 @@ const MainPageTw = () => {
                               {/* uppper image */}
                               <div className='grow cursor-pointer basis-0 w-full  rounded-[16px] relative overflow-hidden '>
                                 <div className='absolute inset-0'>
-                                  <img src={images[0]} alt="" className='w-full h-full  object-scale-down ' />
+                                  <img src={images[0]} alt="" className='w-full h-full  object-scale-down '  />
                                 </div>
                               </div>
                               {/* below image */}
@@ -357,7 +443,7 @@ const MainPageTw = () => {
 
                       <div className='mt-1'>
                         <button className={`bg-iconFIllActive px-5 py-2 mr-2 rounded-[20px] text-white font-medium hover:bg-tweetButonHover text-base ${tweetButtonDisabled ? "opacity-50" : "opacity-100"}`}
-                          onClick={()=>handleSubmit} disabled={tweetButtonDisabled}
+                          onClick={handleSubmit} disabled={tweetButtonDisabled}
                         >Tweet</button>
                         {/* <button
                           onClick={handleDelete}

@@ -18,7 +18,7 @@ const SingleTweet = ({ tweetId }:{tweetId: string}) => {
   const [text, setText] = useState("")
   const router = useRouter();
   const utils = api.useContext();
-  const client = useQueryClient();
+  // const client = useQueryClient();
   const { data: images } = api.tweet.getImagesForUser.useQuery({ tweetId });
 
 
@@ -46,7 +46,10 @@ const SingleTweet = ({ tweetId }:{tweetId: string}) => {
       deleteTweet({ tweetId }),
       deleteImage({ tweetId })
     ]);
-    router.push(`/${sessionData?.user?.username}`)
+    const username = sessionData?.user?.username;
+    if (username) {
+      void router.push(`/${username}`);
+    }
   }
   const { mutateAsync: createCommentFn } = api.tweet.createComment.useMutation({
     onSuccess: () => {
@@ -58,7 +61,7 @@ const SingleTweet = ({ tweetId }:{tweetId: string}) => {
   const handleSubmitComment = (e: React.FormEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter") {
       e.preventDefault();
-      createCommentFn({ text, tweetId })
+      void createCommentFn({ text, tweetId })
     }
   }
 
@@ -114,7 +117,7 @@ const SingleTweet = ({ tweetId }:{tweetId: string}) => {
                     </div>
                     <div className='absolute w-full h-full inset-0'>
                       <div className='rounded-full'>
-                        <Image src={tweet.author.image} alt="avatar" width={48} height={48}  className="rounded-full"/>
+                        <Image src={tweet.author.image!} alt="avatar" width={48} height={48}  className="rounded-full"/>
                       </div>
                     </div>
                   </div>
@@ -311,7 +314,7 @@ const SingleTweet = ({ tweetId }:{tweetId: string}) => {
       
       {/* <Tweet key={tweet.id} tweet={tweet} input={{ where, limit: LIMITTWEETS }} client={client} utils={utils}
       ></Tweet> */}
-      <Comment tweetId ={tweetId} author = {tweet.author} />
+      <Comment tweetId={tweetId} author= {tweet.author} />
 
 
     </div>

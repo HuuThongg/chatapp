@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import type { QueryClient , InfiniteData} from '@tanstack/react-query';
 import Link from 'next/link';
 
@@ -85,13 +86,13 @@ function Tweet({
   tweet,
   client,
   input,
-  // utils
+  utils
 }:{tweet:RouterOutputs['tweet']['timeline']['tweets'][number];
 client: QueryClient;
     input: RouterInputs["tweet"]["timeline"];
     // utils: typeof trpc.useContext
 }){
-  const utils = trpc.useContext();
+  // const utils = trpc.useContext();
 
   const { data: sessionData } = useSession();
   // dimensions of first image
@@ -99,7 +100,14 @@ client: QueryClient;
 
   const tweetId : string = tweet.id;
 
-  const { data: images, isSuccess } = useMemo(() => trpc.tweet.getImagesForUser.useQuery({ tweetId }),[tweetId]);
+  const { data: images, isSuccess } =trpc.tweet.getImagesForUser.useQuery({ tweetId });
+  
+  // const ImagesQueryResult = useMemo(() => {
+  //   return trpc.tweet.getImagesForUser.useQuery({ tweetId });
+  // }, [tweetId]);
+
+  // const { data: images, isSuccess } = ImagesQueryResult;
+
   
   // const getFirstImageSize = useCallback(()=>{
   //   if (images && images.length > 0) {
@@ -134,7 +142,7 @@ client: QueryClient;
 
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  const likeMutation: (variables: { tweetId: string }) => void = trpc.tweet.like.useMutation({
+  const likeMutation :(variables: { tweetId: string }) => void = trpc.tweet.like.useMutation({
     onSuccess:(data, variables)=>{
       updateCache({ client, variables, data, action:"like",input});
     },
@@ -148,6 +156,7 @@ client: QueryClient;
 
   const {mutateAsync : deleteTweet, } = trpc.tweet.deleteTweet.useMutation({
     onSuccess: async () => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       await utils.tweet.timeline.invalidate();
     },
   })
@@ -171,6 +180,9 @@ client: QueryClient;
   }
   const firstImageRatio = imageDimensions.width / imageDimensions.height
   
+  const mystyle = {
+    paddingBottom: `${firstImageRatio * 100}px`,
+  };
   return( 
     <div className=' border-t border-bordercl pt-1 max-w-[598px] w-full z-0  relative'>
       <article className='px-4  hover:bg-tweetHoverCl cursor-pointer '
@@ -263,14 +275,15 @@ client: QueryClient;
                                   <p>dsads</p>
                                 </div>
                               </Link>
-                            ))} */}
+                            ))}
+                             */}
                             {images.length > 0 &&
 
                               <div className='my-1 w-full relative ' >
 
                                 <div className='flex w-full overflow-hidden relative'>
                                   {/* padding */}
-                                  <div className={`w-full ${firstImageRatio > 1.33 ? 'pb-[75%]' : firstImageRatio > 1.00 ? 'pb-[calc(100)px)]' : 'pb-[56.25%]'} ${images.length > 1 ? "pb-[56.25%]" : ""}    `}>
+                                  <div className={`w-full     `} style={mystyle}>
                                   </div>
                                   <div className='absolute w-full h-full  top-0 left-0 bottom-0'>
                                     <div className='flex w-full h-full'>
@@ -331,7 +344,6 @@ client: QueryClient;
 
                               </div>
                             }
-                            
                             
                           </div>
                         </div>

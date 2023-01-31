@@ -31,6 +31,7 @@ const commentCount = 1;
 const hasComment =false;
 
 const Reaction = ({ comment, utils }) => {
+  
   const { data: sessionData } = useSession();
   const userId = sessionData.user?.id;
   console.log(comment)

@@ -87,7 +87,6 @@ const RoomPage = () => {
     //   quality
     // );
 
-
     setImageData(canvasRefResize.current.toDataURL());
   };
 
@@ -176,7 +175,7 @@ const RoomPage = () => {
     <div className='flex flex-col'>
       <div>
 
-        <input type="file" onChange={handleFileChange} />
+        <input type="file" multiple onChange={handleFileChange} />
         <div>
           <input
             type="number"
@@ -190,8 +189,8 @@ const RoomPage = () => {
           />
           <button onClick={handleResize}>Resize</button>
         </div>
-        <canvas ref={canvasRefResize} className='hidden'/>
-        <img src={imageData} />
+        <canvas ref={canvasRefResize} className=''/>
+        {/* <img src={imageData} /> */}
       </div>
       
       <div className="relative">

@@ -4,6 +4,7 @@ import React from 'react'
 import { api } from '../../utils/api'
 import dayjs from 'dayjs'
 import Reaction from './Reaction';
+import { z } from "zod";
 
 
 const Comment = ({tweetId ,author}:{tweetId:string , author:{
@@ -13,7 +14,7 @@ const Comment = ({tweetId ,author}:{tweetId:string , author:{
   const utils = api.useContext();
   const { data: tweet } = api.tweet.getSingleTweet.useQuery({ tweetId });
 
-  const {data: comments}  = api.comment.getComments.useQuery({ tweetId});
+  const { data: comments } = api.comment.getComments.useQuery({ tweetId });
   
   const {mutate: deleteComment} = api.comment.deleteComment.useMutation({
     onSuccess:()=>{
